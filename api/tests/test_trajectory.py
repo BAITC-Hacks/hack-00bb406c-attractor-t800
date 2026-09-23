@@ -1,10 +1,11 @@
 import csv
 import json
+import os
 from pathlib import Path
 import unittest
 from app.domain.trajectory import build_trajectory, calculate_levels, target_profile
 
-DATA = Path(__file__).resolve().parents[2] / 'data' / 'official'
+DATA = Path(os.environ.get('DATASET_PATH', Path(__file__).resolve().parents[2] / 'data' / 'official'))
 
 class TrajectoryTests(unittest.TestCase):
     def row(self, **kwargs):

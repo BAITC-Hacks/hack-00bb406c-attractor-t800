@@ -61,6 +61,8 @@ class ActivityHistory(Base):
     score: Mapped[int | None] = mapped_column(Integer)
     feedback_rating: Mapped[int | None] = mapped_column(Integer)
     assigned_by: Mapped[str] = mapped_column(String, nullable=False)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    recorded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 class DemoSession(Base):
     __tablename__ = "demo_sessions"
     token_hash: Mapped[str] = mapped_column(String, primary_key=True)

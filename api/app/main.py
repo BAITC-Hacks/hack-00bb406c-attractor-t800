@@ -1,3 +1,8 @@
+from typing import Literal
+from app.application.activities import ActivityService
+from app.domain.activities import ActivityConflict
+from app.infrastructure.sql_activities import SqlActivityRepository
+from fastapi.responses import JSONResponse
 import hashlib
 import hmac
 import secrets
@@ -119,3 +124,33 @@ def reset_clock(session: DemoSession = Depends(current_session), db: Session = D
     clock.as_of_date = date(2026, 10, 1)
     db.commit()
     return {"as_of_date": clock.as_of_date}
+
+# Activity endpoints are scoped exclusively to the authenticated employee.
+
+@app.exception_handler(ActivityConflict)
+def activity_conflict_handler(request, exc):
+    return JSONResponse(status_code=409, content={'detail': str(exc)})
+
+def activity_employee(session: DemoSession = Depends(current_session)):
+    if not session.employee_id or session.actor_role == 'operator':
+        raise HTTPException(403, 'Выберите учётную запись сотрудника')
+    return session.employee_id
+
+class Enrollment(BaseModel):
+    session_date: date | None = None
+
+@app.get('/api/me/activities')
+def activities(employee_id: str = Depends(activity_employee), db: Session = Depends(get_db)):
+    return ActivityService(SqlActivityRepository(db)).list(employee_id)
+
+@app.get('/api/me/activities/{event_id}')
+def activity_preview(event_id: str, employee_id: str = Depends(activity_employee), db: Session = Depends(get_db)):
+    return ActivityService(SqlActivityRepository(db)).preview(employee_id, event_id)
+
+@app.post('/api/me/activities/{event_id}/enroll')
+def activity_enroll(event_id: str, payload: Enrollment, employee_id: str = Depends(activity_employee), db: Session = Depends(get_db)):
+    return ActivityService(SqlActivityRepository(db)).enroll(employee_id, event_id, payload.session_date)
+
+@app.post('/api/me/participations/{record_id}/{action}')
+def activity_transition(record_id: str, action: Literal['start', 'complete'], employee_id: str = Depends(activity_employee), db: Session = Depends(get_db)):
+    return ActivityService(SqlActivityRepository(db)).transition(employee_id, record_id, action)
