@@ -19,3 +19,175 @@ html{scroll-behavior:smooth}body{background:var(--paper);font-size:14px}.app{dis
 @media(max-width:600px){.growth-heading{padding:20px 0 17px}.growth-heading h1{font-size:34px;margin:10px 0 8px}.growth-heading p{font-size:10px}.tree-tools{margin-top:17px}.growth-overview{padding:16px 0 11px}.tree-stat strong{font-size:24px}.tree-xp{margin-top:15px}.tree-xp small{display:none}.tree-xp>span{font-size:8px;margin-bottom:7px}.map-toolbar{display:flex;padding:12px 0;gap:8px}.map-legend{flex:1;gap:8px;flex-wrap:wrap}.map-legend button{font-size:8px}.tree-search{margin:0;padding:0;border:0;width:22px}.tree-search input{width:0;padding:0;opacity:0}.tree-search:focus-within{position:absolute;background:var(--paper);left:22px;right:22px;width:auto;z-index:5;min-height:40px;border-bottom:1px solid var(--line)}.tree-search:focus-within input{width:100%;opacity:1}.tree-search:before{content:'';width:28px;height:28px;position:absolute;pointer-events:none}.tree-search input{position:absolute;width:24px;height:28px;right:0;cursor:pointer}.tree-search:focus-within input{position:static;cursor:text}.canvas-intro{padding-top:15px}.botanical-map{margin-top:27px}.branch-art{left:0;width:100%}.skill-label{width:30%;gap:7px;min-height:70px}.skill-name{font-size:11px;line-height:1.5;min-height:32px;gap:4px}.skill-index{font-size:6px;letter-spacing:.5px}.skill-state{font-size:7px}.skill-label:after{width:20%}.skill-label.side-left{left:0}.skill-label.side-right{right:0}}
 
 @media(max-width:600px){.skill-name{font-size:12px}.skill-state{font-size:8px}.skill-label{gap:6px}}
+
+/* Phone-first tree: one image-led viewport, then all information below it. */
+.app[data-view="growth"] {
+  --growth-header-height: 64px;
+  --growth-nav-height: 80px;
+}
+.app[data-view="growth"] .app-header {
+  min-height: var(--growth-header-height);
+  height: var(--growth-header-height);
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.app[data-view="growth"] .app-header .header-eyebrow,
+.app[data-view="growth"] .header-identity,
+.app[data-view="growth"] .header-meeting { display: none; }
+.app[data-view="growth"] .app-header h2 { font-size: 13px; font-weight: 450; }
+.app[data-view="growth"] .app-brand strong { font-size: 23px; }
+.app[data-view="growth"] .brand-rule { height: 23px; }
+.app[data-view="growth"] .growth-screen { padding: 0; max-width: none; width: 100%; overflow: visible; }
+.tree-hero-screen {
+  position: relative;
+  height: calc(100svh - var(--growth-header-height));
+  min-height: 410px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 8px var(--growth-nav-height);
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--paper);
+}
+.tree-portrait {
+  position: relative;
+  height: 100%;
+  aspect-ratio: 1520 / 2688;
+  max-width: 100%;
+  flex: 0 1 auto;
+  pointer-events: none;
+}
+.living-tree {
+  position: absolute;
+  inset: 0;
+  transform: scale(var(--tenure-scale));
+  transform-origin: 50% 94%;
+  transition: transform .45s ease;
+}
+.phone-tree-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+/* Only earned-test labels are composited over the complete generated artwork. */
+.tree-achievements {
+  position: absolute;
+  top: var(--badge-top);
+  bottom: var(--badge-bottom);
+  left: 10%;
+  right: 10%;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+  grid-auto-rows: 34px;
+  align-content: space-around;
+  column-gap: 22px;
+  row-gap: 5px;
+}
+.tree-achievement {
+  pointer-events: auto;
+  min-width: 0;
+  width: max-content;
+  max-width: 100%;
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border-radius: 20px;
+  color: #173f2c;
+  background: #fffff4eb;
+  border: 1px solid #ffffffb0;
+  box-shadow: 0 2px 8px #182f2320;
+  backdrop-filter: blur(8px);
+  font-size: 10px;
+  font-weight: 450;
+  line-height: 1.25;
+  transition: background .15s, box-shadow .15s;
+}
+.tree-achievement > span:first-child { color: #477453; flex-shrink: 0; font-size: 10px; }
+.tree-achievement > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tree-achievement:hover, .tree-achievement:focus-visible { background: #fffef4; box-shadow: 0 2px 12px #14342635; }
+.tree-achievement:nth-child(2n) { translate: 0 12px; }
+.tree-achievements-more { grid-column: 1 / -1; justify-self: center; min-width: 42px; translate: none; }
+.achievement-arriving { animation: achievement-reveal .65s ease both; }
+@keyframes achievement-reveal { from { opacity: 0; scale: .65; } to { opacity: 1; scale: 1; } }
+.tree-hero-screen.autumn .phone-tree-image { filter: sepia(.3) hue-rotate(338deg) saturate(.9); }
+.tree-hero-screen.night { background: #e9eee7; }
+.tree-hero-screen.night .phone-tree-image { filter: saturate(.65) brightness(.85); }
+.tree-scroll-cue {
+  position: absolute;
+  bottom: calc(var(--growth-nav-height) + 7px);
+  left: calc(50% - 18px);
+  width: 36px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  color: #839078;
+  z-index: 6;
+}
+.tree-scroll-cue svg { width: 18px; height: 18px; }
+.tree-information {
+  width: min(1080px, 100%);
+  padding: 36px 28px 50px;
+  margin: 0 auto;
+  scroll-margin-top: calc(var(--growth-header-height) + 12px);
+}
+.tree-information-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.tree-information-heading h1 { font-size: 24px; font-weight: 450; letter-spacing: -.8px; }
+.tree-information-heading > span { font-size: 11px; color: var(--muted); }
+.tree-information .tree-stat { min-width: 0; flex: 1; }
+.tree-information .tree-stat strong { font-size: 28px; }
+.tree-information .tree-xp { width: 220px; flex-shrink: 0; }
+.tree-information-actions { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+.tree-information-actions .text-btn { font-size: 12px; }
+.tree-information .map-toolbar { border-top: 1px solid var(--line); }
+.tree-information .tree-search { position: relative; width: 160px; margin: 0; padding: 0; border: 0; }
+.tree-information .tree-search input { position: static; width: 100%; opacity: 1; font-size: 12px; height: auto; }
+.tree-information .tree-search::before { display: none; }
+.tree-skill-directory { display: grid; grid-template-columns: 1fr 1fr; column-gap: 32px; }
+.directory-skill { display: flex; align-items: center; gap: 10px; text-align: left; min-height: 58px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.directory-skill > span:nth-child(2) { flex: 1; }
+.directory-skill > .icon { width: 13px; height: 13px; color: #9aa38e; }
+.directory-dot { width: 18px; color: #92a085; font-size: 15px; text-align: center; flex-shrink: 0; }
+.directory-skill.passed .directory-dot { color: #42734a; }
+.directory-skill.failed .directory-dot { color: var(--coral); }
+.tree-information-note { margin-top: 22px; font-size: 11px; color: var(--muted); line-height: 1.7; }
+.tree-information .tree-next { margin-top: 32px; }
+.generated-tree img { object-fit: contain; }
+@media (max-width: 600px) {
+  .app[data-view="growth"] { --growth-header-height: 58px; --growth-nav-height: 74px; }
+  .app[data-view="growth"] .app-header { padding-inline: 18px; gap: 12px; }
+  .app[data-view="growth"] .app-header h2 { font-size: 12px; }
+  .app[data-view="growth"] .app-brand strong { font-size: 20px; }
+  .app[data-view="growth"] .app-brand .halyk-symbol { width: 24px; height: 24px; }
+  .app[data-view="growth"] .avatar { width: 30px; height: 30px; font-size: 9px; }
+  .tree-hero-screen { padding-inline: 0; }
+  .tree-information { padding: 28px 22px 40px; }
+  .tree-information-heading { display: block; margin-bottom: 18px; }
+  .tree-information-heading h1 { font-size: 22px; margin-bottom: 8px; }
+  .tree-information-heading > span { font-size: 10px; }
+  .tree-information .tree-stat strong { font-size: 24px; }
+  .tree-information .tree-xp { width: 100%; }
+  .tree-information .tree-xp small { display: flex; font-size: 9px; }
+  .tree-information .map-toolbar { display: block; padding: 15px 0; }
+  .tree-information .map-legend { justify-content: space-between; }
+  .tree-information .map-legend button { font-size: 10px; }
+  .tree-information .tree-search, .tree-information .tree-search:focus-within { position: relative; left: auto; right: auto; width: 100%; margin: 14px 0 0; padding-top: 14px; border-top: 1px solid var(--line); background: none; min-height: 0; }
+  .tree-information .tree-search input { font-size: 12px; }
+  .tree-skill-directory { column-gap: 18px; }
+  .directory-skill { font-size: 11px; gap: 7px; min-height: 55px; }
+  .directory-skill > .icon { display: none; }
+  .directory-dot { width: 12px; font-size: 13px; }
+  .tree-achievement { font-size: 9px; padding: 5px 7px; }
+  .tree-achievements { column-gap: 18px; grid-auto-rows: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .living-tree, .tree-achievement { transition: none; }
+  .achievement-arriving { animation: none; }
+}

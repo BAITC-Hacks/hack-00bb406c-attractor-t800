@@ -4,12 +4,13 @@
     "purpose": "Все сотрудники, тесты, вопросы, цели, награды и интеграции — вымышленные данные для интерактивного UI-прототипа. Приложение загружает этот файл; изменения существуют только в памяти до перезагрузки.",
     "date": "2026-09-23",
     "rules": {
-      "treeSize": "Стаж меняет ширину ветвей, толщину ствола и размер листа: scale = min(1.22, 0.64 + months / 36). Новые навыки добавляют строки ветвей и увеличивают высоту карты.",
+      "treeSize": "Цельные изображения Higgsfield: молодое дерево до 12 месяцев, взрослое — от 12 месяцев. Внутри этапа scale = min(1, 0.88 + months / 200). Портретное изображение сохраняет пропорции на телефоне и компьютере.",
       "xp": "Уникальный тест даёт XP один раз. Неуспешная попытка не даёт XP. Симуляция 1:1 даёт по 100 XP каждому после 15 минут совместного разговора; повторные тики не дублируют награду.",
       "cosmetics": "Темы разблокируются по накопленному XP. XP не тратится.",
       "career": "Игровой уровень не является грейдом. Повышение и переход согласуются людьми.",
       "auth": "Вход Рост показывается только авторизованному сотруднику. Halyk в локальной навигации возвращает в суперапп.",
-      "testAccess": "Данияр — автор IT-тестов; Мадина — автор остальных тестов. Сотрудник не меняет вопросы. Переключаемая cookie — имитация авторизации только для прототипа."
+      "testAccess": "Данияр — автор IT-тестов; Мадина — автор остальных тестов. Сотрудник не меняет вопросы. Переключаемая cookie — имитация авторизации только для прототипа.",
+      "treeProgress": "Поверх готового дерева появляются только названия пройденных тестов. До 10 отметок и кнопка +N; весь список навыков без ограничения расположен ниже первого экрана. Ветки и листья не дорисовываются."
     },
     "generatedTests": {
       "count": 22,
@@ -213,7 +214,8 @@
           "https://react.dev/learn/rendering-lists",
           "https://react.dev/reference/react/useEffect"
         ]
-      }
+      },
+      "badgeLabel": "React"
     },
     {
       "id": "architecture",
@@ -237,7 +239,8 @@
         "createdAt": "2026-09-23T12:13:22.366Z",
         "promptVersion": "1.0.0",
         "positionId": "middle-frontend"
-      }
+      },
+      "badgeLabel": "System Design"
     },
     {
       "id": "sql",
@@ -261,7 +264,8 @@
         "createdAt": "2026-09-23T12:13:34.230Z",
         "promptVersion": "1.0.0",
         "positionId": "middle-frontend"
-      }
+      },
+      "badgeLabel": "SQL"
     },
     {
       "id": "typescript",
@@ -285,7 +289,8 @@
         "createdAt": "2026-09-23T12:13:54.155Z",
         "promptVersion": "1.0.0",
         "positionId": "middle-frontend"
-      }
+      },
+      "badgeLabel": "TypeScript"
     },
     {
       "id": "security",
@@ -309,7 +314,8 @@
         "createdAt": "2026-09-23T12:14:03.258Z",
         "promptVersion": "1.0.0",
         "positionId": "middle-frontend"
-      }
+      },
+      "badgeLabel": "Безопасность"
     },
     {
       "id": "git",
@@ -333,7 +339,8 @@
         "createdAt": "2026-09-23T12:14:17.282Z",
         "promptVersion": "1.0.0",
         "positionId": "middle-frontend"
-      }
+      },
+      "badgeLabel": "Git"
     },
     {
       "id": "api",
@@ -357,7 +364,8 @@
         "createdAt": "2026-09-23T12:14:27.916Z",
         "promptVersion": "1.0.0",
         "positionId": "middle-frontend"
-      }
+      },
+      "badgeLabel": "API"
     },
     {
       "id": "css",
@@ -381,7 +389,8 @@
         "createdAt": "2026-09-23T12:14:55.004Z",
         "promptVersion": "1.0.0",
         "positionId": "middle-frontend"
-      }
+      },
+      "badgeLabel": "CSS"
     },
     {
       "id": "testing",
@@ -405,7 +414,8 @@
         "createdAt": "2026-09-23T12:15:08.854Z",
         "promptVersion": "1.0.0",
         "positionId": "middle-frontend"
-      }
+      },
+      "badgeLabel": "Тестирование"
     },
     {
       "id": "accessibility",
@@ -429,7 +439,8 @@
         "createdAt": "2026-09-23T12:15:22.839Z",
         "promptVersion": "1.0.0",
         "positionId": "middle-frontend"
-      }
+      },
+      "badgeLabel": "Доступность"
     },
     {
       "id": "performance",
@@ -453,7 +464,8 @@
         "createdAt": "2026-09-23T12:15:35.485Z",
         "promptVersion": "1.0.0",
         "positionId": "middle-frontend"
-      }
+      },
+      "badgeLabel": "Performance"
     },
     {
       "id": "review",
@@ -477,7 +489,8 @@
         "createdAt": "2026-09-23T12:15:48.811Z",
         "promptVersion": "1.0.0",
         "positionId": "middle-frontend"
-      }
+      },
+      "badgeLabel": "Code review"
     },
     {
       "id": "discovery",
@@ -501,7 +514,8 @@
         "createdAt": "2026-09-23T12:15:59.353Z",
         "promptVersion": "1.0.0",
         "positionId": "product-manager"
-      }
+      },
+      "badgeLabel": "Discovery"
     },
     {
       "id": "mentor",
@@ -525,7 +539,8 @@
         "createdAt": "2026-09-23T12:16:13.639Z",
         "promptVersion": "1.0.0",
         "positionId": "manager"
-      }
+      },
+      "badgeLabel": "Наставничество"
     },
     {
       "id": "metrics",
@@ -549,7 +564,8 @@
         "createdAt": "2026-09-23T12:16:27.886Z",
         "promptVersion": "1.0.0",
         "positionId": "analyst"
-      }
+      },
+      "badgeLabel": "Метрики"
     },
     {
       "id": "communication",
@@ -573,7 +589,8 @@
         "createdAt": "2026-09-23T12:16:37.273Z",
         "promptVersion": "1.0.0",
         "positionId": "middle-frontend"
-      }
+      },
+      "badgeLabel": "Коммуникация"
     },
     {
       "id": "evidence",
@@ -597,7 +614,8 @@
         "createdAt": "2026-09-23T12:17:03.548Z",
         "promptVersion": "1.0.0",
         "positionId": "employee"
-      }
+      },
+      "badgeLabel": "Результаты"
     },
     {
       "id": "planning",
@@ -621,7 +639,8 @@
         "createdAt": "2026-09-23T12:17:12.872Z",
         "promptVersion": "1.0.0",
         "positionId": "employee"
-      }
+      },
+      "badgeLabel": "Планирование"
     },
     {
       "id": "team-results",
@@ -645,7 +664,8 @@
         "createdAt": "2026-09-23T12:17:28.754Z",
         "promptVersion": "1.0.0",
         "positionId": "manager"
-      }
+      },
+      "badgeLabel": "Команда"
     },
     {
       "id": "career",
@@ -669,7 +689,8 @@
         "createdAt": "2026-09-23T12:17:45.491Z",
         "promptVersion": "1.0.0",
         "positionId": "employee"
-      }
+      },
+      "badgeLabel": "Карьера"
     },
     {
       "id": "competencies",
@@ -693,7 +714,8 @@
         "createdAt": "2026-09-23T12:17:57.361Z",
         "promptVersion": "1.0.0",
         "positionId": "hr"
-      }
+      },
+      "badgeLabel": "Компетенции"
     },
     {
       "id": "learning-impact",
@@ -717,7 +739,8 @@
         "createdAt": "2026-09-23T12:18:08.532Z",
         "promptVersion": "1.0.0",
         "positionId": "hr"
-      }
+      },
+      "badgeLabel": "Обучение"
     }
   ],
   "questions": {
@@ -2382,39 +2405,144 @@
       "name": "Дуб",
       "description": "Уверенность в каждом шаге",
       "xp": 0,
-      "asset": "assets/oak.png",
-      "source": {
+      "asset": "assets/trees/oak-grown.png",
+      "previousAsset": "assets/oak.png",
+      "previousSource": {
         "provider": "Higgsfield",
         "model": "gpt_image_2_5",
         "jobId": "ccb9b4a4-37d2-41b9-8714-38df710b1dd7",
         "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3AzKf1dmqJlJag1aIKPudHRiXHc/hf_20260923_114424_ccb9b4a4-37d2-41b9-8714-38df710b1dd7.png"
-      }
+      },
+      "stages": [
+        {
+          "id": "young",
+          "minMonths": 0,
+          "asset": "assets/trees/oak-young.png",
+          "width": 1520,
+          "height": 2688,
+          "badgeTop": 41,
+          "badgeBottom": 24,
+          "source": {
+            "provider": "Higgsfield",
+            "model": "gpt_image_2_5",
+            "jobId": "743d99c7-de7e-4414-aa48-706fd205c3a8",
+            "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3AzKf1dmqJlJag1aIKPudHRiXHc/hf_20260923_123841_743d99c7-de7e-4414-aa48-706fd205c3a8.png",
+            "prompt": "Create one exquisite photorealistic botanical tree portrait asset for a premium Halyk employee growth mobile app. a magnificent oak with a dense softly rounded crown of fresh green oak leaves and a beautifully textured trunk. YOUNG SMALL TREE: a healthy young tree with a thinner trunk and compact complete leafy crown. The tree including root flare occupies 68% of the image height and 64% of image width, its base at 92% down the canvas. Generous clean breathing room above and beside the smaller tree. Front view, vertical portrait composition designed for a narrow phone screen. The entire healthy tree has its NATURAL FULL FOLIAGE already present as one cohesive beautiful image; this is a complete real tree, not an empty branch skeleton, not separated components. Elegant studio natural daylight, softly illuminated spring-green leaves, warm brown bark, exceptionally fine crisp detail that survives on a high density phone screen, museum-quality botanical photography with a subtle dimensional miniature sensibility. On fully transparent alpha background, no scenery, no sky, no pot, no large soil island, no horizon, only a delicate contact shadow at the roots. Image centered horizontally. No text, labels, letters, badges, arrows, UI, frames, watermark, coins, people or fantasy ornament. Consistent art direction across the collection: refined, organic, believable, softly sculptural. All natural foliage belongs in the image; do not output isolated individual leaves."
+          }
+        },
+        {
+          "id": "grown",
+          "minMonths": 12,
+          "asset": "assets/trees/oak-grown.png",
+          "width": 1520,
+          "height": 2688,
+          "badgeTop": 28,
+          "badgeBottom": 31,
+          "source": {
+            "provider": "Higgsfield",
+            "model": "gpt_image_2_5",
+            "jobId": "a7b01573-35cc-4b76-91f9-8f000177e54a",
+            "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3AzKf1dmqJlJag1aIKPudHRiXHc/hf_20260923_123842_a7b01573-35cc-4b76-91f9-8f000177e54a.png",
+            "prompt": "Create one exquisite photorealistic botanical tree portrait asset for a premium Halyk employee growth mobile app. a magnificent oak with a dense softly rounded crown of fresh green oak leaves and a beautifully textured trunk. LARGE MATURE TREE: a spectacular established tree with a fuller crown and thicker trunk. The entire tree including root flare occupies 88% of the image height and 88% of image width, its base at 94% down the canvas. Entire treetop and every outer branch must remain inside the frame with at least 5% margin. Front view, vertical portrait composition designed for a narrow phone screen. The entire healthy tree has its NATURAL FULL FOLIAGE already present as one cohesive beautiful image; this is a complete real tree, not an empty branch skeleton, not separated components. Elegant studio natural daylight, softly illuminated spring-green leaves, warm brown bark, exceptionally fine crisp detail that survives on a high density phone screen, museum-quality botanical photography with a subtle dimensional miniature sensibility. On fully transparent alpha background, no scenery, no sky, no pot, no large soil island, no horizon, only a delicate contact shadow at the roots. Image centered horizontally. No text, labels, letters, badges, arrows, UI, frames, watermark, coins, people or fantasy ornament. Consistent art direction across the collection: refined, organic, believable, softly sculptural. All natural foliage belongs in the image; do not output isolated individual leaves."
+          }
+        }
+      ]
     },
     {
       "id": "apple",
       "name": "Яблоня",
       "description": "Ваши усилия приносят плоды",
       "xp": 400,
-      "asset": "assets/apple.png",
-      "source": {
+      "asset": "assets/trees/apple-grown.png",
+      "previousAsset": "assets/apple.png",
+      "previousSource": {
         "provider": "Higgsfield",
         "model": "gpt_image_2_5",
         "jobId": "7077d3de-ffa6-4328-8340-79e425fd17cd",
         "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3AzKf1dmqJlJag1aIKPudHRiXHc/hf_20260923_114424_7077d3de-ffa6-4328-8340-79e425fd17cd.png"
-      }
+      },
+      "stages": [
+        {
+          "id": "young",
+          "minMonths": 0,
+          "asset": "assets/trees/apple-young.png",
+          "width": 1520,
+          "height": 2688,
+          "badgeTop": 41,
+          "badgeBottom": 24,
+          "source": {
+            "provider": "Higgsfield",
+            "model": "gpt_image_2_5",
+            "jobId": "efe60140-1b43-4352-b9cf-f7c318e36699",
+            "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3AzKf1dmqJlJag1aIKPudHRiXHc/hf_20260923_123842_efe60140-1b43-4352-b9cf-f7c318e36699.png",
+            "prompt": "Create one exquisite photorealistic botanical tree portrait asset for a premium Halyk employee growth mobile app. an elegant apple tree with a rounded lush green crown, a few delicate ivory blossoms and subtle tiny golden-red apples. YOUNG SMALL TREE: a healthy young tree with a thinner trunk and compact complete leafy crown. The tree including root flare occupies 68% of the image height and 64% of image width, its base at 92% down the canvas. Generous clean breathing room above and beside the smaller tree. Front view, vertical portrait composition designed for a narrow phone screen. The entire healthy tree has its NATURAL FULL FOLIAGE already present as one cohesive beautiful image; this is a complete real tree, not an empty branch skeleton, not separated components. Elegant studio natural daylight, softly illuminated spring-green leaves, warm brown bark, exceptionally fine crisp detail that survives on a high density phone screen, museum-quality botanical photography with a subtle dimensional miniature sensibility. On fully transparent alpha background, no scenery, no sky, no pot, no large soil island, no horizon, only a delicate contact shadow at the roots. Image centered horizontally. No text, labels, letters, badges, arrows, UI, frames, watermark, coins, people or fantasy ornament. Consistent art direction across the collection: refined, organic, believable, softly sculptural. All natural foliage belongs in the image; do not output isolated individual leaves."
+          }
+        },
+        {
+          "id": "grown",
+          "minMonths": 12,
+          "asset": "assets/trees/apple-grown.png",
+          "width": 1520,
+          "height": 2688,
+          "badgeTop": 28,
+          "badgeBottom": 31,
+          "source": {
+            "provider": "Higgsfield",
+            "model": "gpt_image_2_5",
+            "jobId": "0952d26e-ae90-40ce-bad3-6f1eb3e31e41",
+            "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3AzKf1dmqJlJag1aIKPudHRiXHc/hf_20260923_123841_0952d26e-ae90-40ce-bad3-6f1eb3e31e41.png",
+            "prompt": "Create one exquisite photorealistic botanical tree portrait asset for a premium Halyk employee growth mobile app. an elegant apple tree with a rounded lush green crown, a few delicate ivory blossoms and subtle tiny golden-red apples. LARGE MATURE TREE: a spectacular established tree with a fuller crown and thicker trunk. The entire tree including root flare occupies 88% of the image height and 88% of image width, its base at 94% down the canvas. Entire treetop and every outer branch must remain inside the frame with at least 5% margin. Front view, vertical portrait composition designed for a narrow phone screen. The entire healthy tree has its NATURAL FULL FOLIAGE already present as one cohesive beautiful image; this is a complete real tree, not an empty branch skeleton, not separated components. Elegant studio natural daylight, softly illuminated spring-green leaves, warm brown bark, exceptionally fine crisp detail that survives on a high density phone screen, museum-quality botanical photography with a subtle dimensional miniature sensibility. On fully transparent alpha background, no scenery, no sky, no pot, no large soil island, no horizon, only a delicate contact shadow at the roots. Image centered horizontally. No text, labels, letters, badges, arrows, UI, frames, watermark, coins, people or fantasy ornament. Consistent art direction across the collection: refined, organic, believable, softly sculptural. All natural foliage belongs in the image; do not output isolated individual leaves."
+          }
+        }
+      ]
     },
     {
       "id": "pine",
       "name": "Сосна",
       "description": "Расти, оставаясь собой",
       "xp": 600,
-      "asset": "assets/pine.png",
-      "source": {
+      "asset": "assets/trees/pine-grown.png",
+      "previousAsset": "assets/pine.png",
+      "previousSource": {
         "provider": "Higgsfield",
         "model": "gpt_image_2_5",
         "jobId": "63936861-8a29-4dda-b71a-b9694e71c55f",
         "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3AzKf1dmqJlJag1aIKPudHRiXHc/hf_20260923_114424_63936861-8a29-4dda-b71a-b9694e71c55f.png"
-      }
+      },
+      "stages": [
+        {
+          "id": "young",
+          "minMonths": 0,
+          "asset": "assets/trees/pine-young.png",
+          "width": 1520,
+          "height": 2688,
+          "badgeTop": 41,
+          "badgeBottom": 24,
+          "source": {
+            "provider": "Higgsfield",
+            "model": "gpt_image_2_5",
+            "jobId": "1c626c5b-b1c9-497c-b256-2bcac39b5a55",
+            "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3AzKf1dmqJlJag1aIKPudHRiXHc/hf_20260923_123841_1c626c5b-b1c9-497c-b256-2bcac39b5a55.png",
+            "prompt": "Create one exquisite photorealistic botanical tree portrait asset for a premium Halyk employee growth mobile app. a graceful evergreen pine with a richly layered conical crown of dense emerald needles, natural asymmetry and a slender textured trunk. YOUNG SMALL TREE: a healthy young tree with a thinner trunk and compact complete leafy crown. The tree including root flare occupies 68% of the image height and 64% of image width, its base at 92% down the canvas. Generous clean breathing room above and beside the smaller tree. Front view, vertical portrait composition designed for a narrow phone screen. The entire healthy tree has its NATURAL FULL FOLIAGE already present as one cohesive beautiful image; this is a complete real tree, not an empty branch skeleton, not separated components. Elegant studio natural daylight, softly illuminated spring-green leaves, warm brown bark, exceptionally fine crisp detail that survives on a high density phone screen, museum-quality botanical photography with a subtle dimensional miniature sensibility. On fully transparent alpha background, no scenery, no sky, no pot, no large soil island, no horizon, only a delicate contact shadow at the roots. Image centered horizontally. No text, labels, letters, badges, arrows, UI, frames, watermark, coins, people or fantasy ornament. Consistent art direction across the collection: refined, organic, believable, softly sculptural. All natural foliage belongs in the image; do not output isolated individual leaves."
+          }
+        },
+        {
+          "id": "grown",
+          "minMonths": 12,
+          "asset": "assets/trees/pine-grown.png",
+          "width": 1520,
+          "height": 2688,
+          "badgeTop": 28,
+          "badgeBottom": 31,
+          "source": {
+            "provider": "Higgsfield",
+            "model": "gpt_image_2_5",
+            "jobId": "db703061-30d3-4d12-9449-29791e36dbf6",
+            "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3AzKf1dmqJlJag1aIKPudHRiXHc/hf_20260923_123842_db703061-30d3-4d12-9449-29791e36dbf6.png",
+            "prompt": "Create one exquisite photorealistic botanical tree portrait asset for a premium Halyk employee growth mobile app. a graceful evergreen pine with a richly layered conical crown of dense emerald needles, natural asymmetry and a slender textured trunk. LARGE MATURE TREE: a spectacular established tree with a fuller crown and thicker trunk. The entire tree including root flare occupies 88% of the image height and 88% of image width, its base at 94% down the canvas. Entire treetop and every outer branch must remain inside the frame with at least 5% margin. Front view, vertical portrait composition designed for a narrow phone screen. The entire healthy tree has its NATURAL FULL FOLIAGE already present as one cohesive beautiful image; this is a complete real tree, not an empty branch skeleton, not separated components. Elegant studio natural daylight, softly illuminated spring-green leaves, warm brown bark, exceptionally fine crisp detail that survives on a high density phone screen, museum-quality botanical photography with a subtle dimensional miniature sensibility. On fully transparent alpha background, no scenery, no sky, no pot, no large soil island, no horizon, only a delicate contact shadow at the roots. Image centered horizontally. No text, labels, letters, badges, arrows, UI, frames, watermark, coins, people or fantasy ornament. Consistent art direction across the collection: refined, organic, believable, softly sculptural. All natural foliage belongs in the image; do not output isolated individual leaves."
+          }
+        }
+      ]
     }
   ],
   "themes": [

@@ -30,15 +30,3 @@ export function clockText(ms) {
   const seconds = Math.floor(ms / 1000);
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
 }
-
-export function treeLayout(tests, months) {
-  const rows = Math.ceil(tests.length / 2);
-  const size = Math.min(1.22, .64 + Math.max(0, months) / 36);
-  const height = Math.max(900, rows * 135 + 210);
-  const nodes = tests.map((test, i) => {
-    const row = Math.floor(i / 2), side = i % 2 ? 1 : -1;
-    const reach = (112 + Math.sin(row * 1.7) * 14) * size;
-    return { ...test, x: 400 + side * reach, y: 70 + row * 135 + (i % 2 ? 52 : 0), side, row };
-  });
-  return { height, nodes, size, passed: tests.filter(test => test.status === 'passed').length };
-}

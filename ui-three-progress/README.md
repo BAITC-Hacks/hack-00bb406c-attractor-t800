@@ -15,12 +15,12 @@ Open [the skill tree](http://localhost:4173/?view=growth) or [Halyk home](http:/
 
 ## What to try
 
-- **Scroll the tree.** The canvas fills the application; there is no device frame. All 22 skills have their own branches. More skills extend its height without a fixed limit. Passed tests produce filled leaves; unattempted and failed tests remain outlines. Company tenure changes trunk thickness, branch reach and leaf size.
-- **Pass a test.** Each skill has five generated questions, four options per question, a score threshold and explanations. A first passing result adds a leaf and +200 XP. Failure adds neither. Attempts can be paused and resumed in this session. The profile, level and career plan derive from the same state.
-- **Move the settings puck.** Drag the green control anywhere, or focus it and use arrow keys (Shift for larger moves). Click to edit name, role, department, manager, tenure, XP, goal, tree and palette. Changes appear immediately. Add a custom skill to extend the tree; its assigned author must write questions before it can be taken.
+- **Open the tree, then scroll.** The first viewport contains a complete portrait tree, a small header and compact earned-test names. All statistics, controls, filters, search and the unlimited skill directory are below it. Tenure selects a young image before 12 months or a mature image from 12 months, with additional size scaling up to 24 months. The whole image remains visible without cropping.
+- **Pass a test.** Each skill has five generated questions, four options per question, a score threshold and explanations. A first passing result adds a named badge over the tree and +200 XP. The crown shows up to ten badges; a +N button opens the full passed list. The newest passed skill always appears. Failure adds neither. Attempts can be paused and resumed in this session. The profile, level and career plan derive from the same state.
+- **Move the settings puck.** Drag the green control anywhere, or focus it and use arrow keys (Shift for larger moves). Click to edit name, role, department, manager, tenure, XP, goal, tree and palette. Changes appear immediately. Add a custom skill to extend the directory; its assigned author must write questions before it can be taken.
 - **Try a 1:1.** Open the meeting action and acknowledge the recording notice for both simulated participants. The clock counts while the call is active, both participants are present and the microphone is enabled. After 15 minutes, employee and team lead each receive +100 XP once. Pause, disconnect, mute, end early, or use the clearly labelled demo fast-forward. The call requests no camera/microphone access and creates no recordings.
 - **Use the career and contribution views.** Change career direction, submit a code review, mentoring or knowledge-sharing contribution, and confirm it with the labelled demo manager action. Jira sync imports one prepared task and prevents duplicate rewards. The career checklist updates from tests, confirmed contributions and completed 1:1s.
-- **Customize the tree.** Oak, apple and pine have distinct leaf shapes. XP unlocks appearance options; tenure determines physical size. The customization view retains the Higgsfield-generated tree previews.
+- **Customize the tree.** Oak, apple and pine each have young and mature Higgsfield portraits. XP unlocks appearance options; tenure determines size. The appearance picker and tenure previews use the same artwork and size rules as the home screen.
 
 ## Navigation
 
@@ -52,14 +52,14 @@ Prompt sources and exports remain in `test-generation/`. `npm run prompts:export
 
 ## Visual direction
 
-Higgsfield generated two new UI references in `assets/references/desktop.png` and `mobile.png`. They inform the ivory, ink-green, editorial typography and botanical layout. The live tree is SVG so leaves genuinely follow test state and the map can grow with the skill list. The three earlier Higgsfield tree assets remain in the appearance picker. Images are local; the optional Golos Text font has a system fallback.
+Higgsfield generated two new UI references in `assets/references/desktop.png` and `mobile.png`. They inform the ivory, ink-green, editorial typography and botanical layout. The current tree is a complete Higgsfield-generated photograph, with no generated SVG branches or separate leaf sprites. Six transparent 1520 × 2688 PNG portraits live in `assets/trees/`; named test badges are HTML controls over the artwork. Image stages, short badge names, generation prompts and provenance are part of `mock-data.json`. Images are local; the optional Golos Text font has a system fallback.
 
 ## Verification
 
 `npm test` covers the existing prompt/generation suite plus per-test author permissions and forged body identities. Verification does not consume API quota.
 
-Browser checks at 390 × 844 and 1280 × 900 covered scrolling, mobile overflow, successful and failed tests, one leaf/+200 XP, draggable controls, immediate profile/role/XP changes, adding a 23rd skill, author editing, employee denial, and scoped author-studio skills. The simulated call was checked before 15 minutes, after eligibility, with duplicate fast-forward, and with an absent participant. Direct model checks exercised the exact 15-minute boundary, muted/disconnected time, duplicate reward prevention, a 120-skill tree and tenure scaling.
+Browser checks at 390 × 844 and 1280 × 900 covered scrolling, mobile overflow, successful and failed tests, one earned badge/+200 XP, draggable controls, immediate profile/role/XP changes, adding a 23rd skill, author editing, employee denial, and scoped author-studio skills. The simulated call was checked before 15 minutes, after eligibility, with duplicate fast-forward, and with an absent participant. Direct model checks exercised the exact 15-minute boundary, muted/disconnected time, duplicate reward prevention, a 120-skill directory, badge overflow and tenure scaling.
 
 All app changes and test edits are in memory and reset on reload. Only the switchable demo-identity cookie lasts for the browser session. No production deployment, real video service, HR integration, recording storage or real Jira connection is included.
 
-Captured on branch **ui-three-askarbek**.
+Captured on branch **ui-tree-askarbek** (continued from **ui-three-askarbek**).

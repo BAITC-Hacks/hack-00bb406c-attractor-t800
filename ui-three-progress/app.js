@@ -1,4 +1,4 @@
-import { skillTree } from './tree-map.mjs';
+import { skillTree, treeFrame, treeScale } from './tree-map.mjs';
 import { createCall, tickCall, clockText, CALL_TARGET_MS, CALL_XP, canEditTest, actorFromCookie } from './growth-model.mjs';
 import { SKILLS, POSITIONS, getSkill } from './test-generation/catalog.mjs';
 import { buildPrompt } from './test-generation/prompts.mjs';
@@ -47,7 +47,7 @@ let modalReturnFocus;
 let toastTimer;
 let modalType = null;
 let actorId = actorFromCookie(document.cookie);
-let newestLeaf = null;
+let newestAchievement = null;
 let treeSearch = '';
 let treeFilter = 'all';
 const canEdit = id => canEditTest({tests:state?.tests||data.tests}, actorId, id);
@@ -56,7 +56,7 @@ const actor = () => data.access.users.find(user => user.id === actorId) || data.
 const statusName = {passed:'Пройдено',new:'Не начато',failed:'Повторить'};
 function reset(employeeId='aizhan', view='bank') {
   const employee = clone(data.employees.find(e=>e.id===employeeId)||data.employees[0]);
-  newestLeaf = null; treeSearch = ''; treeFilter = 'all';
+  newestAchievement = null; treeSearch = ''; treeFilter = 'all';
   state = {questions:clone(data.questions), call:createCall(), leadXp:data.call.leadInitialXp, employee, isEmployee:employeeId!=='guest', view, tests:clone(data.tests), plan:[], goalId:employee.goalId, xp:employee.xp, tree:employee.tree, theme:employee.theme, testTab:'required', filter:'all', category:'Все', search:'', quiz:null, result:null, attempts:[], contributions:clone(data.contributions), earned:[...data.tests.filter(t=>t.status==='passed').map(t=>'test-'+t.id),...data.contributions.filter(c=>c.status==='confirmed').map(c=>c.id)], meetings:[], jiraConnected:true, jiraSynced:false, lastSync:data.jira.lastSync, draft:null};
   closeModal(false); render();
 }
@@ -70,8 +70,8 @@ const countStatus = name => state.tests.filter(t=>t.required&&t.status===name).l
 const tree = (props={}) => {
   const {species=state.tree,theme=state.theme,months=state.employee.tenureMonths,miniature=false}=props;
   const speciesData=data.trees.find(t=>t.id===species);
-  const size=Math.min(1.22,.64+Math.max(0,months)/36);
-  return `<span class="tree-art generated-tree ${theme} ${miniature?'miniature':''}" style="--tree-scale:${size}"><img src="${speciesData.asset}" alt="${speciesData.name}, стаж ${months} месяцев" width="1024" height="1024" draggable="false">${theme==='night'?'<i class="firefly f1"></i><i class="firefly f2"></i><i class="firefly f3"></i>':''}</span>`;
+  const size=treeScale(months), frame=treeFrame(speciesData,months);
+  return `<span class="tree-art generated-tree ${theme} ${miniature?'miniature':''}" style="--tree-scale:${size}"><img src="${frame.asset}" alt="${speciesData.name}, стаж ${months} месяцев" width="${frame.width}" height="${frame.height}" draggable="false">${theme==='night'?'<i class="firefly f1"></i><i class="firefly f2"></i><i class="firefly f3"></i>':''}</span>`;
 };
 const progress = (value) => `<div class="progress"><span style="width:${Math.max(0,Math.min(100,value))}%"></span></div>`;
 const xp = value => `<span class="xp-pill">${icon('spark')}+${fmt(value)} XP</span>`;
@@ -102,15 +102,22 @@ function stepDone(step){
 function goalReadiness(g=goal()) {const count=g.steps.filter(stepDone).length;return {count,percent:Math.round(100*count/g.steps.length)};}
 function nextTest(){return state.tests.find(t=>t.required&&t.status==='new')||state.tests.find(t=>t.required&&t.status==='failed')||state.tests.find(t=>!t.required&&t.status==='new');}
 function growthView(){
-  const all=[...state.tests].sort((a,b)=>(a.status==='passed'?0:a.status==='failed'?2:1)-(b.status==='passed'?0:b.status==='failed'?2:1));
+  const all=state.tests;
   const shown=all.filter(t=>(treeFilter==='all'||t.status===treeFilter)&&(!treeSearch||(t.title+' '+t.skill).toLowerCase().includes(treeSearch.toLowerCase())));
-  const leaves=all.filter(t=>t.status==='passed').length;
-  return header('Дерево навыков')+`<main class="screen growth-screen" id="screen"><section class="growth-heading"><div><span class="eyebrow">${esc(state.employee.firstName)} / ЛИЧНАЯ КОЛЛЕКЦИЯ ЗНАНИЙ</span><h1>Дерево <em>навыков.</em></h1><p>Каждый пройденный тест — новый лист.</p></div><div class="tree-tools"><button class="text-btn" data-action="navigate" data-view="custom">${icon('palette')}Оформление</button><span></span><button class="text-btn" data-action="navigate" data-view="call">${icon('people')}1:1 с тимлидом ${icon('arrow')}</button></div></section>
-  <div class="growth-overview"><div class="tree-stat"><strong data-leaf-count>${leaves.toString().padStart(2,'0')}</strong><span>листьев собрано</span></div><div class="tree-stat"><strong>${all.length}</strong><span>навыков в карте</span></div><div class="tree-stat"><strong>${tenure()}</strong><span>в Halyk</span></div><button class="tree-xp" data-action="navigate" data-view="activities"><span>УРОВЕНЬ ${currentLevel().level} <b>${fmt(state.xp)} XP</b></span>${progress(levelProgress())}<small>${nextLevel()?fmt(nextLevel().xp-state.xp)+' XP до следующего уровня':'Все уровни открыты'} ${icon('arrow')}</small></button></div>
-  <div class="map-toolbar">${statuses()}<label class="tree-search">${icon('search')}<input id="tree-search" aria-label="Найти навык на дереве" placeholder="Найти навык" value="${esc(treeSearch)}"></label></div>
-  <div class="canvas-intro"><span>01 — ${String(shown.length).padStart(2,'0')} / КАРТА РАЗВИТИЯ</span><span>Листайте вниз ${icon('arrow')}</span></div>
-  ${shown.length?skillTree(shown,{months:state.employee.tenureMonths,species:state.tree,theme:state.theme,highlight:newestLeaf}):'<div class="empty">Такого навыка пока нет в карте.</div>'}
-  <section class="tree-next"><div><span class="eyebrow">СЛЕДУЮЩАЯ ВЕТВЬ</span><h2>${esc(goal().title)}</h2><p>${goalReadiness().count} из ${goal().total} шагов подтверждено</p></div><button class="primary-btn" data-action="navigate" data-view="goals">Открыть мой план ${icon('arrow')}</button></section><div class="growth-footer"><span>HALYK / МОЙ РОСТ</span><span>Размер дерева зависит от стажа. Листья — от знаний.</span></div></main>`;
+  const completed=all.filter(t=>t.status==='passed').length;
+  const artwork=data.trees.find(tree=>tree.id===state.tree);
+  return header('Дерево навыков')+`<main class="screen growth-screen" id="screen">
+    ${skillTree(all,{months:state.employee.tenureMonths,species:state.tree,theme:state.theme,highlight:newestAchievement,artwork})}
+    <section class="tree-information" id="tree-information" tabindex="-1" aria-label="Информация о дереве">
+      <div class="tree-information-heading"><h1>Ваш прогресс</h1><span>${esc(state.employee.firstName)} · ${esc(state.employee.role)}</span></div>
+      <div class="growth-overview"><div class="tree-stat"><strong data-passed-count>${completed.toString().padStart(2,'0')}</strong><span>тестов пройдено</span></div><div class="tree-stat"><strong>${all.length}</strong><span>навыков доступно</span></div><div class="tree-stat"><strong>${tenure()}</strong><span>в Halyk</span></div><button class="tree-xp" data-action="navigate" data-view="activities"><span>УРОВЕНЬ ${currentLevel().level} <b>${fmt(state.xp)} XP</b></span>${progress(levelProgress())}<small>${nextLevel()?fmt(nextLevel().xp-state.xp)+' XP до следующего уровня':'Все уровни открыты'} ${icon('arrow')}</small></button></div>
+      <div class="tree-information-actions"><button class="text-btn" data-action="navigate" data-view="custom">${icon('palette')}Оформление</button><button class="text-btn" data-action="navigate" data-view="call">${icon('people')}1:1 с тимлидом ${icon('arrow')}</button></div>
+      <div class="map-toolbar">${statuses()}<label class="tree-search">${icon('search')}<input id="tree-search" aria-label="Найти навык" placeholder="Найти навык" value="${esc(treeSearch)}"></label></div>
+      <div class="tree-skill-directory">${shown.map(t=>`<button class="directory-skill ${t.status}" data-action="test-open" data-id="${t.id}" aria-label="${esc(t.title)} · ${statusName[t.status]}"><span class="directory-dot" aria-hidden="true">${t.status==='passed'?'✓':t.status==='failed'?'↻':'+'}</span><span>${esc(t.title)}</span>${icon('chevron')}</button>`).join('')||'<p class="empty">Ничего не найдено.</p>'}</div>
+      <p class="tree-information-note">Сданные тесты появляются на дереве. Его размер зависит от стажа.</p>
+      <section class="tree-next"><div><span class="eyebrow">КАРЬЕРНАЯ ЦЕЛЬ</span><h2>${esc(goal().title)}</h2><p>${goalReadiness().count} из ${goal().total} шагов подтверждено</p></div><button class="primary-btn" data-action="navigate" data-view="goals">Открыть мой план ${icon('arrow')}</button></section>
+    </section>
+  </main>`;
 }
 function testRow(t){return `<button class="test-row" data-action="test-open" data-id="${t.id}"><span class="icon-tile ${t.status==='failed'?'coral':''}">${icon(t.status==='passed'?'check':t.status==='failed'?'retry':'book')}</span><div class="grow"><h3>${esc(t.title)}</h3><p>${statusName[t.status]}${t.score!==null?' · '+t.score+'%':' · '+t.minutes+' мин'}</p></div>${t.status==='passed'?pill('Готово','check'):xp(t.xp)}${icon('chevron')}</button>`;}
 function testsView(){
@@ -180,7 +187,7 @@ function startQuiz(id){
 }
 function finishQuiz(){const q=state.quiz,t=test(q.testId),questions=state.questions[t.questionSet],correct=questions.filter((question,i)=>question.correct===q.answers[i]).length,score=Math.round(correct/questions.length*100),passed=score>=t.passScore;
   t.score=score;t.status=passed?'passed':'failed';
-  if(passed){newestLeaf=t.id;const skill=state.employee.skills.find(s=>s.name===t.skill);if(skill)skill.score=Math.max(skill.score,score);else state.employee.skills.push({name:t.skill,score});}
+  if(passed){newestAchievement=t.id;const skill=state.employee.skills.find(s=>s.name===t.skill);if(skill)skill.score=Math.max(skill.score,score);else state.employee.skills.push({name:t.skill,score});}
   const reward=passed?award('test-'+t.id,t.xp):0;
   state.result={testId:t.id,score,correct,total:questions.length,passed,reward,answers:[...q.answers]};
   state.attempts.unshift({testId:t.id,score,passed});
@@ -214,7 +221,7 @@ function openDemoSettings(){
   <label class="field">Вид дерева<select data-demo-field="tree">${data.trees.map(t=>`<option value="${t.id}" ${state.tree===t.id?'selected':''}>${t.name}</option>`).join('')}</select></label>
   <label class="field">Палитра<select data-demo-field="theme">${data.themes.map(t=>`<option value="${t.id}" ${state.theme===t.id?'selected':''}>${t.name}</option>`).join('')}</select></label></div>
   <div class="settings-section"><h4>Доступ к тестам</h4><label class="field">Посмотреть интерфейс от имени<select data-demo-field="actor">${data.access.users.map(user=>`<option value="${user.id}" ${user.id===actorId?'selected':''}>${esc(user.name)} — ${esc(user.label)}</option>`).join('')}</select></label><p class="field-note">Только назначенные авторы могут менять вопросы, порог и параметры своих тестов. Этот переключатель имитирует вход пользователя.</p></div>
-  <div class="settings-section"><h4>Масштаб карты</h4><p class="field-note">Добавьте собственный навык — дерево создаст для него новую ветвь.</p><form id="add-skill-form" class="inline-form"><input name="skillName" aria-label="Название нового навыка" placeholder="Например, Kubernetes" maxlength="50" required><button class="secondary-btn" type="submit">${icon('plus')}Добавить</button></form><label class="field">Состояние навыка<select id="demo-skill">${state.tests.map(t=>`<option value="${t.id}">${esc(t.title)}</option>`).join('')}</select></label><div class="demo-status-buttons"><button class="secondary-btn" data-action="demo-status" data-status="new">Не начато</button><button class="secondary-btn" data-action="demo-status" data-status="passed">Пройдено</button><button class="secondary-btn" data-action="demo-status" data-status="failed">Повторить</button></div><p class="field-note">Смена состояния здесь — симуляция. XP за тест начисляется при настоящем прохождении демо-вопросов.</p></div>
+  <div class="settings-section"><h4>Навыки</h4><p class="field-note">Добавьте навык в список. После прохождения его отметка появится на дереве.</p><form id="add-skill-form" class="inline-form"><input name="skillName" aria-label="Название нового навыка" placeholder="Например, Kubernetes" maxlength="50" required><button class="secondary-btn" type="submit">${icon('plus')}Добавить</button></form><label class="field">Состояние навыка<select id="demo-skill">${state.tests.map(t=>`<option value="${t.id}">${esc(t.title)}</option>`).join('')}</select></label><div class="demo-status-buttons"><button class="secondary-btn" data-action="demo-status" data-status="new">Не начато</button><button class="secondary-btn" data-action="demo-status" data-status="passed">Пройдено</button><button class="secondary-btn" data-action="demo-status" data-status="failed">Повторить</button></div><p class="field-note">Смена состояния здесь — симуляция. XP за тест начисляется при настоящем прохождении демо-вопросов.</p></div>
   <details class="demo-debug"><summary>Состояние интерфейса</summary><pre id="demo-state"></pre></details><div class="modal-actions"><button class="text-btn" data-action="demo-profile">Сменить сотрудника</button><button class="text-btn" data-action="reset">Сбросить демо</button><button class="primary-btn" data-action="close-modal">Готово ${icon('check')}</button></div>`,'settings');
   renderStudio();
 }
@@ -297,11 +304,13 @@ function callConsent(){
 }
 function handleExtraAction(action,el){
   const id=el.dataset.id;
+  if(action==='tree-passed'){treeFilter='passed';treeSearch='';render(true);document.querySelector('#tree-information').scrollIntoView({behavior:'smooth',block:'start'});return true;}
+  if(action==='tree-details'){document.querySelector('#tree-information').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});return true;}
   if(action==='tree-filter'){treeFilter=treeFilter===el.dataset.filter?'all':el.dataset.filter;render(true);return true;}
   if(action==='demo-settings'){openDemoSettings();return true;}
   if(action==='edit-test'){editTest(id);return true;}
   if(action==='editor-add-question'){if(modalType!=='test-editor')return true;const list=document.querySelector('#editor-questions');list.insertAdjacentHTML('beforeend',questionEditor({text:'',options:['','','',''],correct:0,explanation:''},list.children.length));document.querySelector('#editor-count').textContent='Вопросы · '+list.children.length;list.lastElementChild.querySelector('textarea').focus();return true;}
-  if(action==='demo-status'){const t=test(document.querySelector('#demo-skill').value);t.status=el.dataset.status;t.score=t.status==='passed'?100:t.status==='failed'?60:null;if(t.status==='passed')newestLeaf=t.id;render(true);app.inert=true;return true;}
+  if(action==='demo-status'){const t=test(document.querySelector('#demo-skill').value);t.status=el.dataset.status;t.score=t.status==='passed'?100:t.status==='failed'?60:null;if(t.status==='passed')newestAchievement=t.id;render(true);app.inert=true;return true;}
   if(!action.startsWith('call-'))return false;
   tickActiveCall();let c=state.call;
   if(action==='call-consent'){callConsent();return true;}
