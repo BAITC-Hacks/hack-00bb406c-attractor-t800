@@ -4,7 +4,7 @@ from datetime import date, datetime, time, timezone
 from uuid import uuid4
 from fastapi import HTTPException
 from pydantic import BaseModel, Field, ConfigDict, model_validator
-from app.models import DemoClock, Employee, WorkGoal, WorkPlan
+from app.models import DemoClock, Employee, WorkGoal, WorkPlan, ConfirmedRecord
 
 RULES = {'version': 'demo-j-v1', 'effective_from': '2026-10-01',
          'description': 'Демонстрационные правила, не методика Halyk',
@@ -56,10 +56,13 @@ def goal_data(goal):
 def read(db, employee_id):
     goals = db.query(WorkGoal).filter_by(employee_id=employee_id).order_by(WorkGoal.period, WorkGoal.id).all()
     plans = db.query(WorkPlan).filter_by(employee_id=employee_id).order_by(WorkPlan.period).all()
+    actuals = {}
+    for record in db.query(ConfirmedRecord).filter_by(employee_id=employee_id):
+        actuals[record.goal_id] = actuals.get(record.goal_id, 0) + record.amount
     return {'employee_id': employee_id, 'as_of_date': db.get(DemoClock, 1).as_of_date,
             'proposals': [goal_data(g) | {'included_in_j': False} for g in goals if g.status == 'proposed'],
             'plans': [{'period': p.period, 'version': p.version, 'approved_by': p.approved_by, 'approved_at': p.approved_at,
-                       'recorded_at': p.recorded_at, 'rules': p.rules, 'goals': p.goals} for p in plans]}
+                       'recorded_at': p.recorded_at, 'rules': p.rules, 'goals': [g | {'confirmed_actual': g.get('confirmed_actual', 0) + actuals.get(g['id'], 0)} for g in p.goals]} for p in plans]}
 
 
 def propose(db, employee_id, payload):

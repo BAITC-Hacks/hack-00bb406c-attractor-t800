@@ -98,3 +98,24 @@ class WorkPlan(Base):
     recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     goals: Mapped[list] = mapped_column(JSON, nullable=False)
     rules: Mapped[dict] = mapped_column(JSON, nullable=False)
+
+class WorkResult(Base):
+    __tablename__ = 'work_results'
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    employee_id: Mapped[str] = mapped_column(ForeignKey('employees.employee_id'), index=True)
+    goal_id: Mapped[str] = mapped_column(ForeignKey('work_goals.id'), index=True)
+    assigned_to: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String, nullable=False)
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+    claimed_actual: Mapped[float] = mapped_column(Float, nullable=False)
+    evidence: Mapped[list] = mapped_column(JSON, nullable=False)
+    history: Mapped[list] = mapped_column(JSON, nullable=False)
+    rules: Mapped[dict | None] = mapped_column(JSON)
+
+class ConfirmedRecord(Base):
+    __tablename__ = 'confirmed_records'
+    record_id: Mapped[str] = mapped_column(String, primary_key=True)
+    result_id: Mapped[str] = mapped_column(ForeignKey('work_results.id'), index=True)
+    employee_id: Mapped[str] = mapped_column(ForeignKey('employees.employee_id'), index=True)
+    goal_id: Mapped[str] = mapped_column(ForeignKey('work_goals.id'), index=True)
+    amount: Mapped[float] = mapped_column(Float, nullable=False)

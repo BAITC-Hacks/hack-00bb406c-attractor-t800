@@ -59,7 +59,7 @@ def current_session(cq_session: str | None = Cookie(default=None), db: Session =
 class DemoLogin(BaseModel):
     employee_id: str | None = None
     operator: bool = False
-    actor_role: Literal['hr'] | None = None
+    actor_role: Literal['hr', 'analyst', 'analyst_backup'] | None = None
 
 class ClockUpdate(BaseModel):
     as_of_date: date
@@ -79,8 +79,8 @@ def demo_accounts(db: Session = Depends(get_db)):
 def demo_login(payload: DemoLogin, response: Response, db: Session = Depends(get_db)):
     if payload.actor_role and (payload.operator or payload.employee_id):
         raise HTTPException(422, 'Выберите одну демонстрационную учётную запись')
-    if payload.actor_role == 'hr':
-        actor_role, employee_id = 'hr', None
+    if payload.actor_role:
+        actor_role, employee_id = payload.actor_role, None
     elif payload.operator:
         actor_role, employee_id = "operator", None
     elif payload.employee_id and db.get(Employee, payload.employee_id):
@@ -221,3 +221,9 @@ def approve_work_plan(employee_id: str, payload: work_goals.Approval,
 
 from app.import_routes import router as import_router
 app.include_router(import_router(get_db, current_session))
+
+from app.result_routes import router as result_router
+app.include_router(result_router(get_db, current_session))
+
+from app.score_routes import router as score_router
+app.include_router(score_router(get_db, current_session))

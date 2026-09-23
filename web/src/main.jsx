@@ -7,6 +7,8 @@ import Activities from './Activities';
 import HrDashboard from './HrDashboard';
 import ImportPanel from './ImportPanel';
 import WorkGoals from './WorkGoals';
+import WorkResults from './WorkResults';
+import WorkScores from './WorkScores';
 
 async function api(path, options = {}) {
   const response = await fetch(path, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
@@ -15,6 +17,7 @@ async function api(path, options = {}) {
 }
 
 function App() {
+  const [workRevision, setWorkRevision] = useState(0);
   const [actor, setActor] = useState(null);
   const [path, setPath] = useState(window.location.pathname);
   function navigate(nextPath) { window.history.pushState({}, '', nextPath); setPath(nextPath); }
@@ -33,7 +36,7 @@ function App() {
 
   async function refreshProfile(session) {
     if (!session) { setProfile(null); return; }
-    if (session.actor_role === 'hr') { setProfile(null); return; }
+    if (['hr', 'analyst', 'analyst_backup'].includes(session.actor_role)) { setProfile(null); return; }
     if (session.actor_role === 'operator') {
       setProfile(null);
       try { setClock((await api('/api/operator/clock')).as_of_date); } catch {}
@@ -77,12 +80,15 @@ function App() {
       <div className="searchbox"><Search size={18}/><input autoFocus placeholder="Имя, роль или ID сотрудника" value={query} onChange={e => setQuery(e.target.value)}/><kbd>⌘ K</kbd></div>
       <div className="account-list">{filtered.slice(0, 8).map(a => <button className="account-row" key={a.employee_id} onClick={() => login(a.employee_id)}><span className="avatar">{a.full_name.split(' ').map(s => s[0]).slice(0,2).join('')}</span><span className="account-info"><b>{a.full_name}</b><small>{a.role} <i>·</i> {a.grade} <i>·</i> {a.department}</small></span><span className="account-id">{a.employee_id}</span><ArrowRight size={17}/></button>)}{filtered.length === 0 && <div className="no-results">Сотрудник не найден</div>}</div>
       <button className="hr-login-button" onClick={() => login(null, false, 'hr')}><UsersRound size={17}/> Войти как HR — развитие компании <ArrowRight size={17}/></button>
+      <button className="hr-login-button" onClick={() => login(null, false, 'analyst')}>Войти как аналитик — подтверждение результатов</button>
+      <button className="link-button" onClick={() => login(null, false, 'analyst_backup')}>Резервный аналитик</button>
       <div className="login-footer"><span><ShieldCheck size={15}/> Только синтетические данные</span><button onClick={() => login(null, true)}><UserRound size={15}/> Войти как оператор</button></div>
     </section><div className="login-note">ОФИЦИАЛЬНЫЙ СРЕЗ ДАННЫХ <b>·</b> 01 ОКТЯБРЯ 2026</div>
   </main>;
 
   if (path.startsWith('/hr') && actor.actor_role !== 'hr') return <main className="operator-page"><section className="operator-card"><h1>Сводка доступна только HR</h1><p>Текущая учётная запись не имеет доступа к развитию компании.</p><button className="primary-button" onClick={() => navigate('/')}>Вернуться в своё пространство</button><button className="link-button" onClick={logout}>Сменить учётную запись</button></section></main>;
-  if (actor.actor_role === 'hr') return <HrDashboard api={api} onLogout={logout}/>;
+  if (['analyst', 'analyst_backup'].includes(actor.actor_role)) return <WorkResults api={api} actor={actor} onLogout={logout}/>;
+  if (actor.actor_role === 'hr') return <><HrDashboard api={api} onLogout={logout}/><WorkScores api={api}/></>;
 
   if (actor.actor_role === 'operator') return <main className="operator-page"><header className="topbar"><a className="brand" href="#"><span className="brand-icon">cq</span><span>career<span className="brand-light">quest</span></span></a><span className="operator-label"><ShieldCheck size={15}/> Оператор</span><button className="plain-button" onClick={logout}>Выйти <LogOut size={16}/></button></header><section className="operator-card"><div className="eyebrow">ДЕМО-КОНТУР</div><h1>Настройки демонстрации</h1><p>Время сценария хранится на сервере отдельно от официального набора. Изменение не затрагивает системные часы и исходные данные.</p><label className="clock-label">ДАТА ДЕМО-СРЕЗА<input type="date" value={clock} onChange={e => setClock(e.target.value)}/></label><div className="operator-actions"><button className="primary-button" onClick={() => saveClock(clock)}>Сохранить дату</button><button className="secondary-button" onClick={() => saveClock('2026-10-01')}>Вернуть 1 октября</button>{clockSaved && <span className="saved">Сохранено</span>}</div><div className="dataset-note"><CalendarDays size={17}/> Дата официального набора: <b>2026-10-01</b></div><button className="link-button" onClick={logout}><ArrowLeft size={16}/> К выбору аккаунта</button></section><ImportPanel api={api} onChange={async () => setAccounts(await api('/api/demo/accounts'))}/></main>;
 
@@ -95,7 +101,9 @@ function App() {
         {error && <div className="error-box">{error}</div>}
         <section className="hero-panel"><div className="hero-copy"><div className="hero-kicker"><Sparkles size={15}/> КАРЬЕРНАЯ ТРАЕКТОРИЯ</div><h2>{person.career_goal ? <>Шаг за шагом<br/>к новой <em>роли.</em></> : <>Ваш путь<br/>в <em>развитии.</em></>}</h2><p>{person.career_goal ? <>Цель: <b>{profile.employee.goal_label}</b>. Посмотрите, какие навыки помогут приблизиться к ней.</> : <>Карьерная цель пока не выбрана. Профиль и фактическая история уже здесь — следующий шаг можно определить позже.</>}</p><a className="hero-link" href="#skills">Посмотреть навыки <ArrowRight size={17}/></a></div><div className="hero-art"><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="orbit orbit-three"/><div className="route-dot dot-a"/><div className="route-dot dot-b"/><div className="route-dot dot-c"/><div className="route-dot dot-d"/><div className="hero-center"><Compass size={42} strokeWidth={1.2}/></div><div className="art-label label-top">ВАШ МАРШРУТ</div><div className="art-label label-bottom">ОДИН ШАГ ЗА РАЗ</div></div></section>
         <section className="metric-grid"><article className="metric-card"><div className="metric-icon mint"><GraduationCap size={19}/></div><div className="metric-title">ЗАВЕРШЕНО АКТИВНОСТЕЙ</div><div className="metric-value">{completed}<span> / {profile.history_count}</span></div><div className="metric-caption">из истории набора</div></article><article className="metric-card"><div className="metric-icon lilac"><Compass size={19}/></div><div className="metric-title">ТЕКУЩИЙ УРОВЕНЬ</div><div className="metric-value">{person.grade}</div><div className="metric-caption">{person.role}</div></article><article className="metric-card goal-metric"><div className="metric-icon peach"><Sparkles size={18}/></div><div className="metric-title">КАРЬЕРНАЯ ЦЕЛЬ</div><div className="goal-value">{profile.employee.goal_label || 'Пока не выбрана'}</div><div className="metric-caption">{profile.employee.goal_label ? 'Ваш ориентир' : 'Можно определить позже'}</div></article></section>
-        <WorkGoals key={person.employee_id} api={api} actor={actor}/>
+        <WorkScores api={api} revision={workRevision}/>
+        <WorkGoals key={`${person.employee_id}-${workRevision}`} api={api} actor={actor}/>
+        <WorkResults key={person.employee_id} api={api} actor={actor} onChange={() => setWorkRevision(v => v + 1)}/>
         <Trajectory profile={profile}/>
         <Activities key={person.employee_id} profile={profile} api={api} onRefresh={() => refreshProfile(actor)}/>
         <section className="section-heading history-heading"><div><div className="eyebrow">ВАШИ ДАННЫЕ ИЗ НАБОРА</div><h2>История активностей</h2></div><span className="history-total">{profile.history_count} записей</span></section>

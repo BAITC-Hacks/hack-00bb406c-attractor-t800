@@ -21,6 +21,8 @@ def seed():
     try:
         if db.get(DatasetState, "official_dataset_v1"):
             seed_work_plan(db)
+            from app.application.work_scores import seed_scores
+            seed_scores(db)
             return
         # Seed the immutable starter kit only once. Future container starts retain all state.
         for row in employees:
@@ -50,6 +52,8 @@ def seed():
         db.add(DemoClock(id=1, as_of_date=date(2026, 10, 1)))
         db.commit()
         seed_work_plan(db)
+        from app.application.work_scores import seed_scores
+        seed_scores(db)
     except Exception:
         db.rollback()
         raise
