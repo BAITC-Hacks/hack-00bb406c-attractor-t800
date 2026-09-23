@@ -6,7 +6,8 @@ services:
       POSTGRES_USER: career_quest
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-career-quest-local}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      # Keep the foundation schema separate from databases created by other branches.
+      - postgres_foundation_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U career_quest -d career_quest"]
       interval: 3s
@@ -14,6 +15,7 @@ services:
       retries: 20
   api:
     build: ./api
+    pull_policy: build
     environment:
       DATABASE_HOST: db
       POSTGRES_DB: career_quest
@@ -33,10 +35,11 @@ services:
       retries: 30
   web:
     build: ./web
+    pull_policy: build
     ports:
       - "127.0.0.1:8080:80"
     depends_on:
       api:
         condition: service_healthy
 volumes:
-  postgres_data:
+  postgres_foundation_data:
