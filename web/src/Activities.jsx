@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Recommendations from './Recommendations';
 
 export default function Activities({ profile, api, onRefresh }) {
   const [cards, setCards] = useState(null);
@@ -26,6 +27,16 @@ export default function Activities({ profile, api, onRefresh }) {
     setShowForecast(false); setError(''); setNotice('');
   }
 
+  async function openRecommendation(eventId) {
+    setBusy(true); setError('');
+    try {
+      const card = await api(`/api/me/activities/${eventId}`);
+      open(card); setShowForecast(true);
+      requestAnimationFrame(() => document.getElementById('activity-detail')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    } catch (e) { setError(e.message); setReload(value => value + 1); }
+    finally { setBusy(false); }
+  }
+
   async function act(action) {
     setBusy(true); setError(''); setNotice('');
     try {
@@ -51,8 +62,9 @@ export default function Activities({ profile, api, onRefresh }) {
     {notice && <p role="status" className="activity-notice">{notice}</p>}
     {!cards && !error && <p role="status">Загружаем доступные активности…</p>}
     {cards?.length === 0 && <p>Сейчас нет доступных активностей из каталога для вашей роли, грейда и истории.</p>}
+    <Recommendations profile={profile} api={api} onOpen={openRecommendation} busy={busy}/>
     <div className="activity-list">{cards?.map(card => <button key={card.event_id} className={`activity-choice ${selected?.event_id === card.event_id ? 'selected' : ''}`} aria-pressed={selected?.event_id === card.event_id} disabled={busy} onClick={() => open(card)}><b>{card.title}</b><span>{card.duration_hours} ч · {card.format === 'self_paced' ? 'В своём темпе' : card.format === 'offline' ? 'Очно' : 'Онлайн'}{card.participation ? ` · ${card.participation.status === 'planned' ? 'Запланировано' : 'В процессе'}` : ''}</span></button>)}</div>
-    {selected && cards && <article className="activity-detail" aria-label={selected.title}>
+    {selected && cards && <article id="activity-detail" className="activity-detail" aria-label={selected.title}>
       <h3>{selected.title}</h3><p>{selected.description}</p>
       <p>{participation ? `Ваша сессия: ${participation.date}` : selected.format === 'self_paced' ? 'Доступно в своём темпе с текущей даты сценария.' : 'Выберите доступную сессию.'}</p>
       {!participation && <label>Дата {selected.format === 'self_paced' ? 'записи' : 'сессии'}<select value={sessionDate} disabled={busy} onChange={e => setSessionDate(e.target.value)}>{selected.available_sessions.map(day => <option key={day} value={day}>{day}</option>)}</select></label>}

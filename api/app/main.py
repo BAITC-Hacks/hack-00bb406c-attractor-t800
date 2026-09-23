@@ -154,3 +154,12 @@ def activity_enroll(event_id: str, payload: Enrollment, employee_id: str = Depen
 @app.post('/api/me/participations/{record_id}/{action}')
 def activity_transition(record_id: str, action: Literal['start', 'complete'], employee_id: str = Depends(activity_employee), db: Session = Depends(get_db)):
     return ActivityService(SqlActivityRepository(db)).transition(employee_id, record_id, action)
+
+@app.get('/api/me/recommendations')
+def recommendations(employee_id: str = Depends(activity_employee), db: Session = Depends(get_db)):
+    # The sync route keeps SQLAlchemy work off the ASGI event loop; the provider
+    # coroutine has an overall cancellable deadline, including slow responses.
+    import asyncio
+    from app.application.recommendations import RecommendationService
+    from app.infrastructure.openai_recommendations import OpenAIRecommendationModel
+    return asyncio.run(RecommendationService(SqlActivityRepository(db), OpenAIRecommendationModel()).recommend(employee_id))

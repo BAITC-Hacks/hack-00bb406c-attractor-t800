@@ -21,6 +21,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-career-quest-local}
       SESSION_SECRET: ${SESSION_SECRET:-local-demo-session-secret-change-me}
       DATASET_PATH: /app/data/official
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     volumes:
       - ./data/official:/app/data/official:ro
     depends_on:
