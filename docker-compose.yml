@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: career_quest
+      POSTGRES_USER: career_quest
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-career-quest-local}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U career_quest -d career_quest"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  api:
+    build: ./api
+    environment:
+      DATABASE_HOST: db
+      POSTGRES_DB: career_quest
+      POSTGRES_USER: career_quest
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-career-quest-local}
+      SESSION_SECRET: ${SESSION_SECRET:-local-demo-session-secret-change-me}
+      DATASET_PATH: /app/data/official
+    volumes:
+      - ./data/official:/app/data/official:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+  web:
+    build: ./web
+    ports:
+      - "127.0.0.1:8080:80"
+    depends_on:
+      api:
+        condition: service_healthy
+volumes:
+  postgres_data:
