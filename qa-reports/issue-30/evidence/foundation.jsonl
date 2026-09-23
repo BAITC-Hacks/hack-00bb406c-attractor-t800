@@ -1,0 +1,16 @@
+{"started_at": "2026-09-23T12:29:15.307894+00:00", "environment": "HTTP, isolated local Docker Compose", "dataset_version": "1.0", "dataset_date": "2026-10-01"}
+{"check": "anonymous profile denied", "expected": 401, "actual": 401, "duration_ms": 7.36, "status": "пройден"}
+{"check": "official account count", "expected": 200, "actual": 200, "duration_ms": 8.4, "status": "пройден"}
+{"check": "employee login", "expected": 200, "actual": 200, "duration_ms": 4.87, "status": "пройден"}
+{"check": "own profile", "expected": "E0043", "actual": "E0043", "duration_ms": 6.16, "status": "пройден"}
+{"check": "foreign profile denied", "expected": 403, "actual": 403, "duration_ms": 3.96, "status": "пройден"}
+{"check": "employee clock access denied", "expected": 403, "actual": 403, "duration_ms": 2.69, "status": "пройден"}
+{"check": "employee clock mutation denied", "expected": 403, "actual": 403, "duration_ms": 4.48, "status": "пройден"}
+{"check": "switch identity", "expected": "E0174", "actual": "E0174", "duration_ms": 3.81, "status": "пройден"}
+{"check": "switch rotates token", "expected": true, "actual": true, "duration_ms": 0.01, "status": "пройден"}
+{"check": "previous profile denied after switch", "expected": 403, "actual": 403, "duration_ms": 2.73, "status": "пройден"}
+{"check": "logout", "expected": 200, "actual": 200, "duration_ms": 2.96, "status": "пройден"}
+{"check": "logged-out profile denied", "expected": 401, "actual": 401, "duration_ms": 1.49, "status": "пройден"}
+{"check": "operator login", "expected": 200, "actual": 200, "duration_ms": 2.7, "status": "пройден"}
+{"check": "initial controlled date", "expected": "2026-10-01", "actual": "2026-10-01", "duration_ms": 4.19, "status": "пройден"}
+{"check": "set persistence marker", "expected": "2026-10-15", "actual": "2026-10-15", "duration_ms": 4.74, "status": "пройден"}

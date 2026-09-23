@@ -1,91 +1,722 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { ArrowDownLeft, ArrowLeft, ArrowRight, CalendarDays, ChevronDown, CircleHelp, Clock3, Compass, GraduationCap, LogOut, Search, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react';
-import './style.css';
+import React, { useEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  ArrowRight,
+  BookOpen,
+  CalendarDays,
+  Check,
+  CreditCard,
+  Home,
+  LogOut,
+  Search,
+  ShieldCheck,
+  Sprout,
+  Target,
+  TreeDeciduous,
+  UserRound,
+  Wallet,
+} from "lucide-react";
+import "./style.css";
 
 async function api(path, options = {}) {
-  const response = await fetch(path, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
-  if (!response.ok) { const body = await response.json().catch(() => ({})); throw new Error(body.detail || `Ошибка сервера (${response.status})`); }
+  const response = await fetch(path, {
+    credentials: "same-origin",
+    ...options,
+    headers: { "Content-Type": "application/json", ...options.headers },
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    const error = new Error(
+      typeof body.detail === "string"
+        ? body.detail
+        : `Ошибка сервера (${response.status}). Попробуйте ещё раз.`,
+    );
+    error.status = response.status;
+    // Only the API's explicit missing-cookie response is a normal anonymous visit.
+    // A 401 after restoration has begun must explain that the session expired.
+    error.anonymous =
+      path === "/api/session" &&
+      response.status === 401 &&
+      body.detail === "Sign in with a synthetic demo account";
+    throw error;
+  }
   return response.json();
+}
+const initials = (name) =>
+  name
+    .split(" ")
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join("");
+const dateLabel = (value) =>
+  value
+    ? new Date(`${value}T00:00:00`).toLocaleDateString("ru-RU")
+    : "Нет данных";
+const statusLabels = {
+  completed: "Завершено",
+  in_progress: "В процессе",
+  no_show: "Не посещено",
+  declined: "Отклонено",
+  dropped: "Прервано",
+  overdue: "Просрочено",
+  planned: "Запланировано",
+};
+const tabs = [
+  ["growth", TreeDeciduous, "Дерево"],
+  ["tests", BookOpen, "Тесты"],
+  ["goals", Target, "Цели"],
+  ["profile", UserRound, "Профиль"],
+  ["bank", Home, "Halyk"],
+];
+
+function Brand() {
+  return (
+    <div className="wordmark">
+      <span className="brand-seal">h</span>Halyk
+      <span className="brand-divider" />
+      <span className="wordmark-sub">Мой рост</span>
+    </div>
+  );
+}
+function Tree({ decorative = false }) {
+  return (
+    <img
+      className="tree-art"
+      src="/trees/oak.png"
+      width="1024"
+      height="1024"
+      alt={
+        decorative
+          ? ""
+          : "Демонстрационное дерево — дуб. Размер не отражает стаж или прогресс."
+      }
+    />
+  );
+}
+function Goal({ employee }) {
+  return (
+    <>
+      <p className="muted">Моя карьерная цель</p>
+      <h2>{employee.goal_label || "Карьерная цель пока не выбрана"}</h2>
+      <p>
+        {employee.goal_label
+          ? "Цель из вашего серверного профиля."
+          : "Цель отсутствует в официальном наборе. Навыки и история доступны в профиле."}
+      </p>
+    </>
+  );
+}
+
+function Bank({ employee, navigate }) {
+  return (
+    <>
+      <section className="bank-banner">
+        <span className="pill">Демонстрационная оболочка</span>
+        <h1>
+          Всё важное —<br />в Halyk
+        </h1>
+        <p>
+          Банк, покупки и возможности
+          <br />в одном приложении.
+        </p>
+        <div className="mini-bank-card" aria-hidden="true">
+          Halyk
+        </div>
+      </section>
+      <section
+        className="bank-services"
+        aria-label="Банковские сервисы — недоступны"
+      >
+        {[
+          [Wallet, "Мой банк"],
+          [ArrowRight, "Переводы"],
+          [CreditCard, "Платежи"],
+          [CalendarDays, "Рассрочка"],
+        ].map(([Icon, label]) => (
+          <div key={label}>
+            <Icon />
+            <span>{label}</span>
+            <small>Недоступно</small>
+          </div>
+        ))}
+      </section>
+      <button
+        className="growth-entry"
+        aria-label="Открыть Мой рост"
+        onClick={() => navigate("growth")}
+      >
+        <span className="entry-copy">
+          <h2>
+            Время расти.
+            <br />В своём темпе.
+          </h2>
+          <p>
+            Ваши навыки, цели
+            <br />и новые возможности.
+          </p>
+          <span className="primary-btn">
+            Мой рост <ArrowRight size={16} />
+          </span>
+        </span>
+        <Tree decorative />
+      </button>
+      <p className="bank-greeting">
+        <ShieldCheck size={16} /> {employee.full_name} · {employee.employee_id}
+      </p>
+      <p className="notice">
+        Банковские операции недоступны. Балансы и бонусы не подключены.
+      </p>
+    </>
+  );
+}
+function Growth({ profile, navigate }) {
+  const person = profile.employee;
+  return (
+    <>
+      <section className="tree-hero">
+        <p>{person.full_name}, это ваше место роста</p>
+        <h1>Расти в своём темпе</h1>
+        <div className="tree-stage">
+          <Tree />
+          {profile.skills.slice(0, 3).map((skill, index) => (
+            <button
+              className={`tree-node node-${index}`}
+              key={skill.skill_id}
+              onClick={() => navigate("profile")}
+            >
+              <span className="node-circle">
+                <Sprout size={13} />
+              </span>
+              {skill.name} · {skill.level}/5
+            </button>
+          ))}
+        </div>
+        <div className="hero-foot">
+          <span>Дерево · демонстрация</span>
+          <span>XP: нет данных</span>
+        </div>
+      </section>
+      <p className="help-text">
+        Вид и размер дерева иллюстративные. Уровень дерева и XP не
+        рассчитываются.
+      </p>
+      <button className="goal-card" onClick={() => navigate("goals")}>
+        <Target />
+        <span>
+          <small>Моя карьерная цель</small>
+          <strong>{person.goal_label || "Пока не выбрана"}</strong>
+        </span>
+        <ArrowRight size={18} />
+      </button>
+      <div className="section-heading">
+        <h2>Ваш следующий шаг</h2>
+      </div>
+      <div className="next-steps">
+        <button onClick={() => navigate("profile")}>
+          <UserRound />
+          <strong>Навыки и история</strong>
+          <span>
+            Посмотреть профиль <ArrowRight size={15} />
+          </span>
+        </button>
+        <button onClick={() => navigate("tests")}>
+          <BookOpen />
+          <strong>Тесты навыков</strong>
+          <span>Скоро · пока недоступны</span>
+        </button>
+      </div>
+    </>
+  );
+}
+function Profile({ profile }) {
+  const person = profile.employee;
+  return (
+    <>
+      <section className="profile-card">
+        <div className="person">
+          <span className="avatar large">{initials(person.full_name)}</span>
+          <div>
+            <h1>{person.full_name}</h1>
+            <p>
+              {person.role} · {person.grade}
+            </p>
+            <span className="pill">{person.employee_id}</span>
+          </div>
+        </div>
+        <dl className="profile-grid">
+          <div>
+            <dt>Подразделение</dt>
+            <dd>{person.department}</dd>
+          </div>
+          <div>
+            <dt>Стаж из набора</dt>
+            <dd>
+              {person.tenure_months == null
+                ? "Нет данных"
+                : `${person.tenure_months} мес.`}
+            </dd>
+          </div>
+          <div>
+            <dt>Руководитель · ID</dt>
+            <dd>{person.manager_id || "Нет данных"}</dd>
+          </div>
+          <div>
+            <dt>Последняя оценка</dt>
+            <dd>{dateLabel(person.last_review_date)}</dd>
+          </div>
+        </dl>
+      </section>
+      <section className="profile-section">
+        <h2>Навыки вашей роли</h2>
+        <p className="muted">Текущий уровень и требования роли · шкала 0–5</p>
+        {profile.skills.length ? (
+          <div className="skill-list">
+            {profile.skills.map((skill) => (
+              <div className="skill-row" key={skill.skill_id}>
+                <div>
+                  <strong>{skill.name}</strong>
+                  {skill.critical && (
+                    <small className="critical">Критический навык</small>
+                  )}
+                </div>
+                <span>{skill.level} / 5</span>
+                <small>
+                  Требование: {skill.required_level ?? "нет данных"}
+                </small>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="empty">Навыки пока отсутствуют.</p>
+        )}
+      </section>
+      <section className="profile-section">
+        <h2>История активностей</h2>
+        <p className="muted">
+          Показано {profile.history.length} из {profile.history_count} записей
+        </p>
+        {profile.history.length ? (
+          <div className="history-list">
+            {profile.history.map((item) => (
+              <article key={item.record_id} className="history-row">
+                <div>
+                  <h3>{item.title}</h3>
+                  <p>
+                    {item.event_id} ·{" "}
+                    {item.mandatory ? "Обязательная" : "Добровольная"}
+                  </p>
+                </div>
+                <span
+                  className={`status ${item.status === "completed" ? "completed" : ""}`}
+                >
+                  {statusLabels[item.status] || item.status}
+                </span>
+                <time dateTime={item.date}>{dateLabel(item.date)}</time>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="empty">История активностей пока пуста.</p>
+        )}
+      </section>
+    </>
+  );
+}
+function Operator({ clock, setClock, saveClock, saved, busy }) {
+  return (
+    <section className="operator-card">
+      <ShieldCheck />
+      <h1>Настройки демонстрации</h1>
+      <p>Дата хранится на сервере отдельно от официального набора данных.</p>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          saveClock(false);
+        }}
+      >
+        <label>
+          Дата демонстрации
+          <input
+            type="date"
+            required
+            value={clock}
+            onChange={(event) => setClock(event.target.value)}
+          />
+        </label>
+        <div className="operator-actions">
+          <button className="primary-btn" disabled={busy || !clock}>
+            Сохранить дату
+          </button>
+          <button
+            type="button"
+            className="secondary-btn"
+            disabled={busy}
+            onClick={() => saveClock(true)}
+          >
+            Вернуть 1 октября
+          </button>
+        </div>
+      </form>
+      {saved && (
+        <p role="status" className="saved">
+          <Check size={16} /> Сохранено: {dateLabel(saved)}
+        </p>
+      )}
+      <p className="muted">Дата официального набора: 01.10.2026</p>
+    </section>
+  );
 }
 
 function App() {
   const [actor, setActor] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [profile, setProfile] = useState(null);
-  const [query, setQuery] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [clock, setClock] = useState('2026-10-01');
-  const [clockSaved, setClockSaved] = useState(false);
+  const [query, setQuery] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(true);
+  const [view, setView] = useState("bank");
+  const [clock, setClock] = useState("");
+  const [saved, setSaved] = useState("");
+  const [ready, setReady] = useState(false);
+  const content = useRef(null);
+  // A request generation prevents an obsolete account/profile request from repopulating the UI.
+  const generation = useRef(0);
 
-  async function refreshProfile(session) {
-    if (!session) { setProfile(null); return; }
-    if (session.actor_role === 'operator') {
+  function clearIdentity() {
+    setActor(null);
+    setProfile(null);
+    setClock("");
+    setSaved("");
+    setView("bank");
+    setReady(false);
+  }
+  function handleError(e) {
+    if (e.status === 401) {
+      clearIdentity();
+      setError("Сессия истекла. Войдите снова.");
+    } else setError(e.message);
+  }
+  async function loadSession() {
+    const session = await api("/api/session");
+    const data = await api(
+      session.actor_role === "operator"
+        ? "/api/operator/clock"
+        : "/api/me/profile",
+    );
+    return { session, data };
+  }
+  function applySession({ session, data }) {
+    setActor(session);
+    if (session.actor_role === "operator") {
+      setClock(data.as_of_date);
       setProfile(null);
-      try { setClock((await api('/api/operator/clock')).as_of_date); } catch {}
-      return;
+    } else {
+      setProfile(data);
+      setClock("");
     }
-    setProfile(await api('/api/me/profile'));
+    setReady(true);
   }
   async function initialize() {
-    setLoading(true); setError('');
+    const current = ++generation.current;
+    setBusy(true);
+    setError("");
+    clearIdentity();
     try {
-      const rows = await api('/api/demo/accounts'); setAccounts(rows);
-      try { const session = await api('/api/session'); setActor(session); await refreshProfile(session); }
-      catch { setActor(null); setProfile(null); }
-    } catch (e) { setError(e.message); }
-    finally { setLoading(false); }
+      const [accountResult, sessionResult] = await Promise.allSettled([
+        api("/api/demo/accounts"),
+        loadSession(),
+      ]);
+      if (current !== generation.current) return;
+      if (accountResult.status === "fulfilled")
+        setAccounts(accountResult.value);
+      if (sessionResult.status === "fulfilled")
+        applySession(sessionResult.value);
+      else if (!sessionResult.reason.anonymous) throw sessionResult.reason;
+      if (accountResult.status === "rejected") throw accountResult.reason;
+    } catch (e) {
+      if (current === generation.current) handleError(e);
+    } finally {
+      if (current === generation.current) setBusy(false);
+    }
   }
-  useEffect(() => { initialize(); }, []);
-  const filtered = useMemo(() => accounts.filter(x => `${x.full_name} ${x.employee_id} ${x.role} ${x.department}`.toLowerCase().includes(query.toLowerCase())), [accounts, query]);
+  useEffect(() => {
+    initialize();
+    return () => {
+      generation.current++;
+    };
+  }, []);
+  useEffect(() => {
+    document.title =
+      view === "bank" ? "Halyk · Career Quest" : "Halyk · Мой рост";
+  }, [view]);
 
   async function login(employee_id, operator = false) {
-    setError(''); setLoading(true);
-    try { await api('/api/demo/login', { method: 'POST', body: JSON.stringify({ employee_id, operator }) }); const session = await api('/api/session'); setActor(session); await refreshProfile(session); }
-    catch (e) { setError(e.message); }
-    finally { setLoading(false); }
+    const current = ++generation.current;
+    setBusy(true);
+    setError("");
+    clearIdentity();
+    try {
+      const session = await api("/api/demo/login", {
+        method: "POST",
+        body: JSON.stringify({ employee_id, operator }),
+      });
+      if (current !== generation.current) return;
+      setActor(session);
+      const data = await api(
+        operator ? "/api/operator/clock" : "/api/me/profile",
+      );
+      if (current === generation.current) applySession({ session, data });
+    } catch (e) {
+      if (current === generation.current) handleError(e);
+    } finally {
+      if (current === generation.current) setBusy(false);
+    }
   }
   async function logout() {
-    try { await api('/api/session', { method: 'DELETE' }); } catch {}
-    setActor(null); setProfile(null); setQuery('');
+    ++generation.current;
+    setBusy(true);
+    setError("");
+    setSaved("");
+    try {
+      await api("/api/session", { method: "DELETE" });
+      clearIdentity();
+      setQuery("");
+    } catch (e) {
+      handleError(e);
+    } finally {
+      setBusy(false);
+    }
   }
-  async function saveClock(value) {
-    setError('');
-    try { const saved = value === '2026-10-01' ? await api('/api/operator/clock/reset', { method: 'POST' }) : await api('/api/operator/clock', { method: 'PUT', body: JSON.stringify({ as_of_date: value }) }); setClock(saved.as_of_date); setClockSaved(true); setTimeout(() => setClockSaved(false), 2200); }
-    catch (e) { setError(e.message); }
+  async function navigate(next) {
+    const current = ++generation.current;
+    setBusy(true);
+    setError("");
+    try {
+      const result = await loadSession();
+      if (current !== generation.current) return;
+      applySession(result);
+      setView(next);
+      requestAnimationFrame(() => {
+        content.current?.focus();
+        window.scrollTo(0, 0);
+      });
+    } catch (e) {
+      if (current === generation.current) {
+        setProfile(null);
+        setReady(false);
+        handleError(e);
+      }
+    } finally {
+      if (current === generation.current) setBusy(false);
+    }
   }
-
-  if (loading) return <div className="splash"><div className="mark">cq</div><span>Открываем Career Quest…</span></div>;
-  if (!actor) return <main className="login-wrap">
-    <div className="login-head"><a className="brand" href="#"><span className="brand-icon">cq</span><span>career<span className="brand-light">quest</span></span></a><span className="demo-chip"><span className="live-dot"/>ДЕМО-СРЕДА</span></div>
-    <section className="login-card"><div className="eyebrow"><Sparkles size={15}/> ВАШ СЛЕДУЮЩИЙ ШАГ</div><h1>Рост начинается<br/>с <em>вас.</em></h1><p className="login-copy">Выберите синтетическую учётную запись, чтобы открыть профиль сотрудника из официального набора.</p>
-      {error && <div className="error-box">{error}</div>}
-      <div className="searchbox"><Search size={18}/><input autoFocus placeholder="Имя, роль или ID сотрудника" value={query} onChange={e => setQuery(e.target.value)}/><kbd>⌘ K</kbd></div>
-      <div className="account-list">{filtered.slice(0, 8).map(a => <button className="account-row" key={a.employee_id} onClick={() => login(a.employee_id)}><span className="avatar">{a.full_name.split(' ').map(s => s[0]).slice(0,2).join('')}</span><span className="account-info"><b>{a.full_name}</b><small>{a.role} <i>·</i> {a.grade} <i>·</i> {a.department}</small></span><span className="account-id">{a.employee_id}</span><ArrowRight size={17}/></button>)}{filtered.length === 0 && <div className="no-results">Сотрудник не найден</div>}</div>
-      <div className="login-footer"><span><ShieldCheck size={15}/> Только синтетические данные</span><button onClick={() => login(null, true)}><UserRound size={15}/> Войти как оператор</button></div>
-    </section><div className="login-note">ОФИЦИАЛЬНЫЙ СРЕЗ ДАННЫХ <b>·</b> 01 ОКТЯБРЯ 2026</div>
-  </main>;
-
-  if (actor.actor_role === 'operator') return <main className="operator-page"><header className="topbar"><a className="brand" href="#"><span className="brand-icon">cq</span><span>career<span className="brand-light">quest</span></span></a><span className="operator-label"><ShieldCheck size={15}/> Оператор</span><button className="plain-button" onClick={logout}>Выйти <LogOut size={16}/></button></header><section className="operator-card"><div className="eyebrow">ДЕМО-КОНТУР</div><h1>Настройки демонстрации</h1><p>Время сценария хранится на сервере отдельно от официального набора. Изменение не затрагивает системные часы и исходные данные.</p><label className="clock-label">ДАТА ДЕМО-СРЕЗА<input type="date" value={clock} onChange={e => setClock(e.target.value)}/></label><div className="operator-actions"><button className="primary-button" onClick={() => saveClock(clock)}>Сохранить дату</button><button className="secondary-button" onClick={() => saveClock('2026-10-01')}>Вернуть 1 октября</button>{clockSaved && <span className="saved">Сохранено</span>}</div><div className="dataset-note"><CalendarDays size={17}/> Дата официального набора: <b>2026-10-01</b></div><button className="link-button" onClick={logout}><ArrowLeft size={16}/> К выбору аккаунта</button></section></main>;
-
-  if (!profile) return null;
-  const person = profile.employee;
-  const completed = profile.history.filter(h => h.status === 'completed').length;
-  return <div className="app-shell"><aside className="sidebar"><a className="brand" href="#"><span className="brand-icon">cq</span><span>career<span className="brand-light">quest</span></span></a><div className="nav-section">РАБОЧЕЕ ПРОСТРАНСТВО</div><button className="nav-item active"><Compass size={17}/> Мой рост</button><button className="nav-item muted" title="Откроется в следующих разделах"><UsersRound size={17}/> Моя команда</button><div className="sidebar-bottom"><div className="privacy-card"><ShieldCheck size={16}/><span>Ваши данные<br/><b>защищены</b></span></div><span className="build-label">Career Quest · набор 1.0</span></div></aside>
-    <main className="main-area"><header className="topbar"><button className="mobile-brand"><span className="brand-icon">cq</span> careerquest</button><div className="crumb">Мой рост <span>/</span> Обзор</div><div className="top-actions"><span className="date-pill"><CalendarDays size={15}/> {new Date(`${profile.as_of_date}T00:00:00`).toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'})}</span><button className="user-menu" onClick={logout}><span className="user-mini">{person.full_name.split(' ').map(s=>s[0]).slice(0,2).join('')}</span><span>{person.full_name}</span><ChevronDown size={15}/></button></div></header>
-      <div className="content"><section className="welcome-row"><div><div className="eyebrow"><span className="green-mark"/> ВАШ ПРОФИЛЬ · {person.employee_id}</div><h1>Здравствуйте, {person.full_name.split(' ')[0]}</h1><p className="subheading">Здесь собран ваш карьерный путь и история развития.</p></div><div className="profile-badge"><span className="avatar large">{person.full_name.split(' ').map(s=>s[0]).slice(0,2).join('')}</span><span><b>{person.role}</b><small>{person.grade} · {person.department}</small></span></div></section>
-        {error && <div className="error-box">{error}</div>}
-        <section className="hero-panel"><div className="hero-copy"><div className="hero-kicker"><Sparkles size={15}/> КАРЬЕРНАЯ ТРАЕКТОРИЯ</div><h2>{person.career_goal ? <>Шаг за шагом<br/>к новой <em>роли.</em></> : <>Ваш путь<br/>в <em>развитии.</em></>}</h2><p>{person.career_goal ? <>Цель: <b>{profile.employee.goal_label}</b>. Посмотрите, какие навыки помогут приблизиться к ней.</> : <>Карьерная цель пока не выбрана. Профиль и фактическая история уже здесь — следующий шаг можно определить позже.</>}</p><a className="hero-link" href="#skills">Посмотреть навыки <ArrowRight size={17}/></a></div><div className="hero-art"><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="orbit orbit-three"/><div className="route-dot dot-a"/><div className="route-dot dot-b"/><div className="route-dot dot-c"/><div className="route-dot dot-d"/><div className="hero-center"><Compass size={42} strokeWidth={1.2}/></div><div className="art-label label-top">ВАШ МАРШРУТ</div><div className="art-label label-bottom">ОДИН ШАГ ЗА РАЗ</div></div></section>
-        <section className="metric-grid"><article className="metric-card"><div className="metric-icon mint"><GraduationCap size={19}/></div><div className="metric-title">ЗАВЕРШЕНО АКТИВНОСТЕЙ</div><div className="metric-value">{completed}<span> / {profile.history_count}</span></div><div className="metric-caption">из истории набора</div></article><article className="metric-card"><div className="metric-icon lilac"><Compass size={19}/></div><div className="metric-title">ТЕКУЩИЙ УРОВЕНЬ</div><div className="metric-value">{person.grade}</div><div className="metric-caption">{person.role}</div></article><article className="metric-card goal-metric"><div className="metric-icon peach"><Sparkles size={18}/></div><div className="metric-title">КАРЬЕРНАЯ ЦЕЛЬ</div><div className="goal-value">{profile.employee.goal_label || 'Пока не выбрана'}</div><div className="metric-caption">{profile.employee.goal_label ? 'Ваш ориентир' : 'Можно определить позже'}</div></article></section>
-        <section className="section-heading" id="skills"><div><div className="eyebrow">БАЗА ДЛЯ СЛЕДУЮЩЕГО ШАГА</div><h2>Навыки вашей роли</h2></div><span className="skill-caption">Оценка на {new Date(`${person.last_review_date}T00:00:00`).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})}</span></section>
-        <section className="skills-card">{profile.skills.slice(0, 8).map(skill => <div className="skill-row" key={skill.skill_id}><div className="skill-name">{skill.name}{skill.critical && <span className="critical-tag">КРИТИЧЕСКИЙ</span>}</div><div className="skill-meter"><span style={{width:`${Math.max(0,Math.min(100,skill.level/5*100))}%`}}/></div><div className="skill-level">{skill.level}<span> / 5</span></div><div className="skill-target">Цель <b>{skill.required_level ?? '—'}</b></div></div>)}<div className="more-skills">Показаны 8 навыков из профиля этой роли. Расчётные уровни обновятся в следующих шагах продукта.</div></section>
-        <section className="section-heading history-heading"><div><div className="eyebrow">ВАШИ ДАННЫЕ ИЗ НАБОРА</div><h2>История активностей</h2></div><span className="history-total">{profile.history_count} записей</span></section>
-        <section className="history-card">{profile.history.slice(0, 8).map(item => <article className="history-row" key={item.record_id}><div className={`history-icon ${item.status}`}><GraduationCap size={17}/></div><div className="history-info"><b>{item.title}</b><small>{item.event_id} <i>·</i> {item.mandatory ? 'Обязательная' : 'Добровольная'}</small></div><span className={`status-pill ${item.status}`}>{item.status === 'completed' ? 'Завершено' : item.status === 'in_progress' ? 'В процессе' : item.status === 'no_show' ? 'Не посещено' : item.status === 'declined' ? 'Отклонено' : item.status === 'dropped' ? 'Прервано' : 'Просрочено'}</span><time>{new Date(`${item.date}T00:00:00`).toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'})}</time></article>)}{profile.history_count > 8 && <div className="history-more">Показаны последние 8 записей из {profile.history_count}</div>}</section>
-        <footer className="page-foot"><span>Демонстрационное приложение · данные синтетические</span><a href="#top"><ArrowDownLeft size={14}/> В начало</a></footer>
-      </div>
-    </main>
-  </div>;
+  async function saveClock(reset) {
+    setBusy(true);
+    setError("");
+    setSaved("");
+    try {
+      const result = await api(
+        reset ? "/api/operator/clock/reset" : "/api/operator/clock",
+        reset
+          ? { method: "POST" }
+          : { method: "PUT", body: JSON.stringify({ as_of_date: clock }) },
+      );
+      setClock(result.as_of_date);
+      setSaved(result.as_of_date);
+    } catch (e) {
+      handleError(e);
+    } finally {
+      setBusy(false);
+    }
+  }
+  const filtered = accounts.filter((account) =>
+    `${account.full_name} ${account.employee_id} ${account.role} ${account.department}`
+      .toLowerCase()
+      .includes(query.toLowerCase()),
+  );
+  return (
+    <div className="app-shell">
+      <header className="topbar">
+        <Brand />
+        {actor && (
+          <button className="logout" onClick={logout} disabled={busy}>
+            <LogOut size={17} /> Выйти
+          </button>
+        )}
+      </header>
+      <main
+        className={`content ${!actor ? "login-content" : ""}`}
+        ref={content}
+        tabIndex={-1}
+        aria-busy={busy}
+      >
+        {error && (
+          <div className="error-box" role="alert">
+            <p>{error}</p>
+            <button
+              className="secondary-btn"
+              disabled={busy}
+              onClick={initialize}
+            >
+              Повторить загрузку
+            </button>
+          </div>
+        )}
+        {busy && (
+          <p role="status" className="loading">
+            Загружаем данные…
+          </p>
+        )}
+        {!busy && !actor && (
+          <section className="login-card">
+            <Sprout className="login-sprout" />
+            <h1>Рост начинается с вас</h1>
+            <p>
+              Выберите синтетическую учётную запись из официального набора
+              данных.
+            </p>
+            <label className="search">
+              <Search size={20} />
+              <input
+                aria-label="Поиск сотрудника"
+                placeholder="Имя, ID, роль или подразделение"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+              />
+            </label>
+            <p className="result-count">
+              Найдено: {filtered.length}. Показано:{" "}
+              {Math.min(8, filtered.length)}. Уточните поиск.
+            </p>
+            <div className="account-list">
+              {filtered.slice(0, 8).map((account) => (
+                <button
+                  key={account.employee_id}
+                  className="account-row"
+                  onClick={() => login(account.employee_id)}
+                >
+                  <span className="avatar">{initials(account.full_name)}</span>
+                  <span>
+                    <strong>{account.full_name}</strong>
+                    <small>
+                      {account.role} · {account.grade} · {account.department}
+                    </small>
+                    <small>{account.employee_id}</small>
+                  </span>
+                  <ArrowRight size={18} />
+                </button>
+              ))}
+              {!filtered.length && (
+                <p className="empty">
+                  Сотрудник не найден. Попробуйте другое имя или ID.
+                </p>
+              )}
+            </div>
+            <button
+              className="operator-login"
+              onClick={() => login(null, true)}
+            >
+              <ShieldCheck size={17} /> Войти как оператор
+            </button>
+          </section>
+        )}
+        {!busy && actor && !ready && (
+          <section className="empty">
+            <h1>Не удалось загрузить данные</h1>
+            <p>Повторите загрузку или выйдите для смены аккаунта.</p>
+          </section>
+        )}
+        {actor && ready && actor.actor_role === "operator" && (
+          <Operator
+            clock={clock}
+            setClock={(value) => {
+              setClock(value);
+              setSaved("");
+            }}
+            saveClock={saveClock}
+            saved={saved}
+            busy={busy}
+          />
+        )}
+        {!busy && actor && ready && profile && (
+          <>
+            <div className="page-heading">
+              <div>
+                <p className="muted">
+                  {profile.employee.role} · {profile.employee.grade}
+                </p>
+                <h2>
+                  {view === "bank"
+                    ? "Здравствуйте, " + profile.employee.full_name
+                    : "Мой рост"}
+                </h2>
+              </div>
+              <span className="date">
+                <CalendarDays size={16} /> Демо: {dateLabel(profile.as_of_date)}
+              </span>
+            </div>
+            {view === "bank" && (
+              <Bank employee={profile.employee} navigate={navigate} />
+            )}
+            {view === "growth" && (
+              <Growth profile={profile} navigate={navigate} />
+            )}
+            {view === "profile" && <Profile profile={profile} />}
+            {view === "tests" && (
+              <section className="empty card">
+                <BookOpen size={38} />
+                <h1>Тесты навыков</h1>
+                <p>
+                  Прохождение и генерация тестов пока недоступны. Результаты не
+                  сохраняются, XP не начисляется.
+                </p>
+                <button
+                  className="secondary-btn"
+                  onClick={() => navigate("profile")}
+                >
+                  Посмотреть навыки
+                </button>
+              </section>
+            )}
+            {view === "goals" && (
+              <section className="card goal-detail">
+                <Target size={32} />
+                <Goal employee={profile.employee} />
+                <p className="notice">
+                  Изменение цели, план развития и встречи пока недоступны. Эта
+                  страница показывает сохранённую цель.
+                </p>
+                <button
+                  className="secondary-btn"
+                  onClick={() => navigate("profile")}
+                >
+                  Посмотреть профиль
+                </button>
+              </section>
+            )}
+            <footer className="page-foot">
+              Синтетические данные · Career Quest · набор{" "}
+              {profile.dataset_version}
+            </footer>
+          </>
+        )}
+      </main>
+      {actor && actor.actor_role !== "operator" && (
+        <nav className="bottom-nav" aria-label="Навигация Мой рост">
+          {tabs.map(([id, Icon, label]) => (
+            <button
+              key={id}
+              aria-current={view === id ? "page" : undefined}
+              disabled={busy}
+              onClick={() => navigate(id)}
+            >
+              <Icon size={23} />
+              <span>{label}</span>
+            </button>
+          ))}
+        </nav>
+      )}
+    </div>
+  );
 }
-
-createRoot(document.getElementById('root')).render(<App/>);
+createRoot(document.getElementById("root")).render(<App />);
