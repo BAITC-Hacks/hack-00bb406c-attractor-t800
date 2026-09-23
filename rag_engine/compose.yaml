@@ -1,0 +1,37 @@
+services:
+  db:
+    image: pgvector/pgvector:0.8.6-pg17-trixie
+    environment:
+      POSTGRES_DB: rag
+      POSTGRES_USER: rag
+      POSTGRES_PASSWORD: ${RAG_DB_PASSWORD:-local-rag-change-me}
+    volumes:
+      - rag_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag -d rag"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  engine:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://rag:${RAG_DB_PASSWORD:-local-rag-change-me}@db:5432/rag
+      RAG_API_KEY: ${RAG_API_KEY:-local-rag-api-key-change-me}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2}
+      FASTEMBED_CACHE_PATH: /models
+      DATASET_DIR: /dataset
+      RAG_PROTOTYPE_UI: ${RAG_PROTOTYPE_UI:-1}
+    volumes:
+      - rag_models:/models
+      - ${DATASET_DIR:-/Users/ilayqq/Downloads/case_1/career_quest_dataset}:/dataset:ro
+    ports:
+      - "127.0.0.1:${RAG_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  rag_pgdata:
+  rag_models:
