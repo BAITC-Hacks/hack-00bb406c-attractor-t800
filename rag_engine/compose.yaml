@@ -21,6 +21,7 @@ services:
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2}
       FASTEMBED_CACHE_PATH: /models
       DATASET_DIR: /dataset
+      RAG_PROTOTYPE_UI: ${RAG_PROTOTYPE_UI:-1}
     volumes:
       - rag_models:/models
       - ${DATASET_DIR:-/Users/ilayqq/Downloads/case_1/career_quest_dataset}:/dataset:ro

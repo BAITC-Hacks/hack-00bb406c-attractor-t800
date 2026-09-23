@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Career Quest · RAG Lab (прототип)</title>
+  <style>
+    :root { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #18312c; background: #f4f6f2; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; border: 0; }
+    button:disabled { opacity: .45; cursor: wait; }
+    input, textarea, select { width: 100%; padding: 10px 12px; border: 1px solid #c9d7d0; border-radius: 10px; background: #fff; color: #18312c; }
+    textarea { min-height: 100px; resize: vertical; }
+    label { display: block; font-size: 12px; font-weight: 700; color: #536a60; }
+    label input, label select, label textarea { margin-top: 5px; font-weight: 400; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: 22px; letter-spacing: -.04em; margin-bottom: 3px; }
+    h2 { font-size: 18px; letter-spacing: -.03em; }
+    h3 { font-size: 14px; }
+    p { line-height: 1.5; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; line-height: 1.5; }
+    .muted { color: #70837a; }
+    .small { font-size: 12px; }
+    .eyebrow { text-transform: uppercase; letter-spacing: .13em; font-size: 10px; font-weight: 800; color: #408d68; }
+    .brandbar { background: #153d32; color: #fff; padding: 17px 28px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+    .brandbar h1 { margin: 0; }
+    .brandbar .muted { color: #b7d3c4; }
+    .pill { display: inline-flex; align-items: center; border-radius: 99px; padding: 5px 9px; background: #245747; color: #d7f4e2; font-size: 11px; font-weight: 700; }
+    .settings { display: grid; grid-template-columns: 1.2fr .8fr .7fr .8fr 1.4fr .9fr; gap: 10px; padding: 14px 28px; background: #e8eee9; border-bottom: 1px solid #d3dfd7; align-items: end; }
+    .settings label { min-width: 0; }
+    .settings input, .settings select { height: 39px; }
+    .status { margin: 14px 28px 0; padding: 10px 14px; border-radius: 10px; background: #def1e3; color: #21593b; font-size: 13px; }
+    .status.error { background: #ffe7e2; color: #a63c2a; }
+    .variant { display: none; margin: 18px 28px 90px; }
+    .variant.active { display: grid; }
+    .panel { background: #fff; border: 1px solid #dde7df; border-radius: 16px; padding: 18px; min-width: 0; }
+    .panel > h2 { margin-bottom: 6px; }
+    .card { padding: 13px; border: 1px solid #dce6de; border-radius: 12px; margin: 9px 0; background: #fff; }
+    .card:hover { border-color: #77a98b; }
+    .card .card-top { display: flex; justify-content: space-between; gap: 8px; align-items: start; }
+    .card strong { font-size: 13px; }
+    .card p { font-size: 12px; margin: 7px 0; color: #53685d; }
+    .tag { border-radius: 5px; background: #e6efe8; padding: 3px 6px; color: #387152; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .linkbutton { background: none; padding: 2px 0; color: #167449; font-weight: 700; font-size: 12px; }
+    .primary { background: #18794e; color: white; border-radius: 9px; padding: 11px 16px; font-weight: 700; }
+    .secondary { background: #e6eee8; color: #205d3d; border-radius: 9px; padding: 10px 14px; font-weight: 700; }
+    .danger { background: #fee6df; color: #a33826; border-radius: 9px; padding: 10px 14px; font-weight: 700; }
+    .row { display: flex; gap: 8px; align-items: center; }
+    .row > * { min-width: 0; }
+    .row input { flex: 1; }
+    .stack { display: grid; gap: 10px; }
+    .scroll { overflow: auto; max-height: 490px; }
+    .mono-box { background: #f3f7f3; border: 1px solid #dce8df; border-radius: 10px; padding: 12px; max-height: 300px; overflow: auto; }
+    .chat { min-height: 360px; max-height: 55vh; overflow: auto; padding: 4px; }
+    .bubble { padding: 13px 15px; border-radius: 14px; margin: 10px 0; max-width: 90%; font-size: 13px; line-height: 1.5; }
+    .bubble.user { background: #18794e; color: #fff; margin-left: auto; border-bottom-right-radius: 3px; }
+    .bubble.engine { background: #e8f2e9; border-bottom-left-radius: 3px; }
+    .bubble pre { margin-bottom: 0; }
+    .empty { padding: 30px 14px; text-align: center; color: #809388; font-size: 13px; }
+    .variant-a { grid-template-columns: minmax(0, 1.55fr) minmax(350px, 1fr); gap: 16px; }
+    .variant-a .chat-column { display: flex; flex-direction: column; min-height: 68vh; }
+    .variant-a .chat { flex: 1; }
+    .variant-a .side-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .variant-b { grid-template-columns: minmax(220px, .78fr) minmax(360px, 1.4fr) minmax(270px, 1fr); gap: 12px; align-items: start; }
+    .variant-b .panel { min-height: 66vh; }
+    .variant-b .results { max-height: 49vh; overflow: auto; }
+    .variant-b .chat { min-height: 160px; max-height: 220px; }
+    .variant-c { grid-template-columns: minmax(0, 1.7fr) minmax(290px, .85fr); gap: 18px; }
+    .variant-c .workflow { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .variant-c .step { border-left: 4px solid #51a572; }
+    .variant-c .chat { min-height: 260px; max-height: 350px; }
+    .debug { margin: 16px 28px 100px; }
+    .debug summary { cursor: pointer; color: #647b6e; font-size: 12px; }
+    .debug pre { max-height: 220px; overflow: auto; }
+    .switcher { position: fixed; z-index: 20; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; background: #132e27; color: #fff; border-radius: 99px; padding: 7px; box-shadow: 0 12px 35px #183c3655; font-size: 12px; white-space: nowrap; }
+    .switcher button { width: 34px; height: 34px; border-radius: 50%; background: #315b4a; color: #fff; font-size: 19px; }
+    .switcher strong { min-width: 195px; text-align: center; }
+    @media (max-width: 1060px) { .settings { grid-template-columns: repeat(3, 1fr); } .variant-a, .variant-b, .variant-c { grid-template-columns: 1fr; } .variant-b .panel { min-height: auto; } }
+    @media (max-width: 620px) { .brandbar { padding: 15px; } .settings { grid-template-columns: 1fr 1fr; padding: 12px 15px; } .variant { margin: 14px 15px 80px; } .status { margin: 12px 15px 0; } .variant-a .chat-column { min-height: 50vh; } .variant-a .chat { min-height: 230px; } .variant-c .workflow { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <!-- ПРОТОТИП: три варианта интерфейса проверки RAG на одной странице ?variant=A|B|C. -->
+  <header class="brandbar">
+    <div><div class="eyebrow">ПРОТОТИП · Career Quest</div><h1>RAG Lab</h1><span class="muted small">Поиск и контекст без генерации ответа LLM</span></div>
+    <div class="row"><span class="pill" id="health">Проверяем сервис…</span><a href="/docs" style="color:#d0f2dd;font-size:12px">API /docs ↗</a></div>
+  </header>
+  <div class="settings">
+    <label>API ключ <input type="password" id="api-key" placeholder="RAG_API_KEY из .env" autocomplete="off"></label>
+    <label>Namespace <select id="namespace"><option value="career-quest">career-quest</option><option value="rag-ui-prototype">rag-ui-prototype</option></select></label>
+    <label>Режим <select id="mode"><option value="hybrid">Hybrid</option><option value="semantic">Semantic</option><option value="lexical">Lexical</option></select></label>
+    <label>Типы через запятую <input id="kinds" placeholder="activity, event"></label>
+    <label>Метаданные JSON <input id="filters" value="{}" spellcheck="false"></label>
+    <label>Актуально на <input id="as-of" type="datetime-local"></label>
+  </div>
+  <div class="status" id="status">Введите API ключ из <code>rag_engine/.env</code>, затем отправьте запрос.</div>
+
+  <section class="variant variant-a" id="variant-a">
+    <div class="panel chat-column">
+      <div class="eyebrow">A · Диалог</div><h2>Спросите у индекса</h2>
+      <p class="muted small">Сообщение ниже — найденный контекст с источниками, а не совет ассистента.</p>
+      <div class="chat" data-chat></div>
+      <form data-query-form class="row"><input data-query placeholder="Например: Какие мероприятия посещал E0001?"><button class="primary" type="submit">Найти</button></form>
+      <p class="small muted" style="margin:8px 0 0">Поиск → контекст → цитаты. Ограничьте данные через типы и метаданные сверху.</p>
+    </div>
+    <div class="stack">
+      <div class="panel"><div class="eyebrow">Основания ответа</div><h2>Ранжированные фрагменты</h2><div class="scroll" data-results></div></div>
+      <div class="panel side-tabs"><div><h3>Контекст для LLM</h3><pre class="mono-box" data-context></pre></div><div><h3>Исходная запись</h3><pre class="mono-box" data-document></pre></div></div>
+    </div>
+  </section>
+
+  <section class="variant variant-b" id="variant-b">
+    <aside class="panel">
+      <div class="eyebrow">B · Каталог</div><h2>Корпус данных</h2>
+      <button class="secondary" data-action="stats">Статистика</button>
+      <div data-stats></div>
+      <h3 style="margin-top:22px">Точный просмотр записей</h3>
+      <p class="small muted">Lookup выдаёт полные источники и поддерживает фильтр по метаданным.</p>
+      <button class="secondary" data-action="lookup">Получить 20 записей</button>
+      <div class="scroll" data-lookup></div>
+      <button class="secondary" data-action="more" style="display:none" data-more>Следующая страница</button>
+    </aside>
+    <main class="panel">
+      <div class="eyebrow">Поисковая лаборатория</div><h2>Проверить запрос</h2>
+      <form data-query-form class="row"><input data-query placeholder="Запрос на русском или қазақша"><button class="primary" type="submit">Искать</button></form>
+      <p class="small muted">Сравните hybrid / semantic / lexical и примените фильтры в верхней панели.</p>
+      <div class="results" data-results></div>
+      <h3>Диалог запросов</h3><div class="chat" data-chat></div>
+    </main>
+    <aside class="panel">
+      <div class="eyebrow">Инспектор</div><h2>Сырой ответ API</h2>
+      <h3>Контекст</h3><pre class="mono-box" data-context></pre>
+      <h3>Исходный документ</h3><pre class="mono-box" data-document></pre>
+      <h3>Последняя операция</h3><pre class="mono-box" data-response></pre>
+    </aside>
+  </section>
+
+  <section class="variant variant-c" id="variant-c">
+    <main>
+      <div class="eyebrow">C · Пошаговая проверка</div><h2>Путь документа через RAG</h2>
+      <p class="small muted">Операции ниже показывают импорт, поиск, обновление, повторный поиск и удаление. Запись создаётся только в <code>rag-ui-prototype</code>.</p>
+      <div class="workflow">
+        <div class="panel step"><div class="eyebrow">01 · Индексация</div><h3>Загрузить текущий датасет</h3><p class="small muted">Повторный импорт пропускает неизменённые записи и удаляет пропавшие из снимка.</p><button class="secondary" data-action="import">Перечитать датасет</button><div data-stats></div></div>
+        <div class="panel step"><div class="eyebrow">02 · Поиск</div><h3>Запрос к индексу</h3><form data-query-form class="stack"><input data-query placeholder="Как развить навык для повышения?"><button class="primary" type="submit">Найти контекст</button></form><div class="scroll" data-results></div></div>
+        <div class="panel step"><div class="eyebrow">03 · Обновление</div><h3>Тестовая запись</h3>
+          <label>Название <input id="scratch-title" value="Правило обучения (прототип)"></label>
+          <label style="margin-top:8px">Версия <input id="scratch-version" value="1"></label>
+          <label style="margin-top:8px">Содержание <textarea id="scratch-content"># Обучение
+Сотрудники могут пройти внутренний курс по аналитике данных. Обновите эту запись и повторите поиск, чтобы проверить свежесть индекса.</textarea></label>
+          <div class="row" style="margin-top:10px"><button class="primary" data-action="upsert">Создать / обновить</button><button class="danger" data-action="delete">Удалить</button></div>
+          <p class="small muted">ID: <code>rag-ui-demo-rule</code>. После создания namespace переключится на прототип.</p>
+        </div>
+        <div class="panel step"><div class="eyebrow">04 · Результат</div><h3>Контекст и источник</h3><pre class="mono-box" data-context></pre><pre class="mono-box" data-document></pre></div>
+      </div>
+    </main>
+    <aside class="panel">
+      <div class="eyebrow">Мини-диалог</div><h2>Что вернул движок</h2><div class="chat" data-chat></div>
+      <h3>Последняя операция</h3><pre class="mono-box" data-response></pre>
+      <h3>Журнал</h3><div class="mono-box small" id="event-log"></div>
+    </aside>
+  </section>
+
+  <details class="debug"><summary>Состояние прототипа · запрос, фильтры, источники, ответ API</summary><pre class="mono-box" id="debug-state"></pre></details>
+  <div class="switcher" aria-label="Варианты прототипа"><button id="previous" aria-label="Предыдущий вариант">←</button><strong id="variant-label"></strong><button id="next" aria-label="Следующий вариант">→</button></div>
+
+  <script>
+    const variants = ['A', 'B', 'C'];
+    const names = {A: 'Диалог и основания', B: 'Поисковая лаборатория', C: 'Путь документа'};
+    const scratchNamespace = 'rag-ui-prototype';
+    const scratchId = 'rag-ui-demo-rule';
+    const state = {
+      variant: variants.includes(new URLSearchParams(location.search).get('variant')) ? new URLSearchParams(location.search).get('variant') : 'A',
+      key: '', namespace: 'career-quest', mode: 'hybrid', kinds: '', filters: '{}', asOf: '',
+      query: '', messages: [], results: [], context: null, document: null, stats: null,
+      lookup: [], cursor: null, response: null, log: [], busy: false
+    };
+    const $ = (selector) => document.querySelector(selector);
+    const all = (selector) => document.querySelectorAll(selector);
+    function setStatus(message, error) {
+      $('#status').textContent = message;
+      $('#status').classList.toggle('error', !!error);
+    }
+    function pushLog(label, data) {
+      state.response = {operation: label, data: data};
+      state.log.unshift(new Date().toLocaleTimeString('ru-RU') + ' · ' + label);
+      state.log = state.log.slice(0, 8);
+      render();
+    }
+    async function api(path, method, payload) {
+      if (!state.key) throw new Error('Введите API ключ из rag_engine/.env.');
+      const response = await fetch(path, {
+        method: method,
+        headers: {'X-API-Key': state.key, ...(payload ? {'Content-Type': 'application/json'} : {})},
+        body: payload ? JSON.stringify(payload) : undefined
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error((data.detail && typeof data.detail === 'string') ? data.detail : JSON.stringify(data));
+      return data;
+    }
+    function searchPayload() {
+      let filters;
+      try { filters = JSON.parse(state.filters || '{}'); } catch { throw new Error('Метаданные должны быть валидным JSON.'); }
+      if (!filters || Array.isArray(filters) || typeof filters !== 'object') throw new Error('Фильтр должен быть JSON объектом.');
+      const payload = {namespace: state.namespace, query: state.query.trim(), mode: state.mode, filters: filters, limit: 8};
+      if (!payload.query) throw new Error('Введите поисковый запрос.');
+      if (state.kinds.trim()) payload.kinds = state.kinds.split(',').map(v => v.trim()).filter(Boolean);
+      if (state.asOf) payload.as_of = new Date(state.asOf).toISOString();
+      return payload;
+    }
+    async function run(label, job) {
+      if (state.busy) return;
+      state.busy = true;
+      all('button').forEach(button => { if (button.dataset.action || button.type === 'submit') button.disabled = true; });
+      setStatus(label + '…');
+      try {
+        const data = await job();
+        pushLog(label, data);
+        setStatus(label + ' выполнено.');
+      } catch (error) {
+        pushLog(label + ' · ошибка', String(error.message || error));
+        setStatus(error.message || String(error), true);
+      } finally {
+        state.busy = false;
+        all('button').forEach(button => button.disabled = false);
+      }
+    }
+    async function ask() {
+      await run('Поиск и сбор контекста', async () => {
+        const payload = searchPayload();
+        state.messages.push({role: 'user', text: state.query});
+        const found = await api('/v1/search', 'POST', payload);
+        state.results = found.results;
+        const assembled = await api('/v1/context', 'POST', {...payload, max_chars: 6000});
+        state.context = assembled;
+        state.document = null;
+        state.messages.push({role: 'engine', text: assembled.context || 'Совпадений не найдено.', citations: assembled.citations});
+        return {search: found, context: assembled};
+      });
+    }
+    async function stats() {
+      await run('Статистика', async () => {
+        state.stats = await api('/v1/stats?namespace=' + encodeURIComponent(state.namespace), 'GET');
+        return state.stats;
+      });
+    }
+    async function lookup(more) {
+      await run('Просмотр записей', async () => {
+        let filters;
+        try { filters = JSON.parse(state.filters || '{}'); } catch { throw new Error('Метаданные должны быть валидным JSON.'); }
+        const payload = {namespace: state.namespace, filters: filters, limit: 20};
+        if (state.kinds.trim()) payload.kinds = state.kinds.split(',').map(v => v.trim()).filter(Boolean);
+        if (more && state.cursor) payload.cursor = state.cursor;
+        const data = await api('/v1/lookup', 'POST', payload);
+        state.lookup = more ? state.lookup.concat(data.results) : data.results;
+        state.cursor = data.next_cursor;
+        return data;
+      });
+    }
+    async function inspect(sourceId) {
+      await run('Исходная запись ' + sourceId, async () => {
+        state.document = await api('/v1/documents?namespace=' + encodeURIComponent(state.namespace) + '&source_id=' + encodeURIComponent(sourceId), 'GET');
+        return state.document;
+      });
+    }
+    async function upsertScratch() {
+      await run('Обновление тестовой записи', async () => {
+        const payload = {
+          namespace: scratchNamespace, source_id: scratchId, kind: 'prototype_rule',
+          title: $('#scratch-title').value, content: $('#scratch-content').value,
+          source_version: $('#scratch-version').value,
+          metadata: {purpose: 'rag-ui-prototype'}
+        };
+        const data = await api('/v1/documents', 'PUT', payload);
+        state.namespace = scratchNamespace;
+        $('#namespace').value = scratchNamespace;
+        state.query = payload.title;
+        all('[data-query]').forEach(input => input.value = state.query);
+        state.document = await api('/v1/documents?namespace=' + scratchNamespace + '&source_id=' + scratchId, 'GET');
+        state.stats = await api('/v1/stats?namespace=' + scratchNamespace, 'GET');
+        return data;
+      });
+    }
+    async function deleteScratch() {
+      await run('Удаление тестовой записи', async () => {
+        const data = await api('/v1/documents?namespace=' + scratchNamespace + '&source_id=' + scratchId, 'DELETE');
+        state.document = null;
+        state.results = [];
+        state.context = null;
+        state.stats = await api('/v1/stats?namespace=' + state.namespace, 'GET');
+        return data;
+      });
+    }
+    async function importDataset() {
+      await run('Повторный импорт датасета', async () => {
+        const data = await api('/v1/import/career-quest', 'POST');
+        state.namespace = 'career-quest';
+        $('#namespace').value = state.namespace;
+        state.stats = await api('/v1/stats?namespace=career-quest', 'GET');
+        return data;
+      });
+    }
+    function node(tag, className, text) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      if (text !== undefined) element.textContent = text;
+      return element;
+    }
+    function renderResults(container) {
+      container.replaceChildren();
+      if (!state.results.length) { container.append(node('div', 'empty', 'Отправьте запрос, чтобы увидеть фрагменты и ссылки на источники.')); return; }
+      state.results.forEach((result, index) => {
+        const card = node('div', 'card');
+        const top = node('div', 'card-top');
+        top.append(node('strong', '', (index + 1) + '. ' + result.title), node('span', 'tag', result.kind));
+        card.append(top, node('p', '', result.content), node('div', 'small muted', result.citation_id + ' · v' + result.source_version + ' · ' + result.matched_by.join(' + ')));
+        const button = node('button', 'linkbutton', 'Открыть исходную запись ↗');
+        button.dataset.sourceId = result.source_id;
+        card.append(button);
+        container.append(card);
+      });
+    }
+    function renderMessages(container) {
+      container.replaceChildren();
+      if (!state.messages.length) { container.append(node('div', 'empty', 'Начните диалог с вопроса. Найденный контекст появится здесь.')); return; }
+      state.messages.forEach(message => {
+        const bubble = node('div', 'bubble ' + message.role);
+        bubble.append(node('strong', '', message.role === 'user' ? 'Вы' : 'RAG · найденный контекст'));
+        bubble.append(node('pre', '', message.text));
+        if (message.citations && message.citations.length) bubble.append(node('div', 'small', 'Источники: ' + message.citations.map(c => c.citation_id).join(', ')));
+        container.append(bubble);
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+    function renderStats(container) {
+      container.replaceChildren();
+      if (!state.stats || state.stats.namespace !== state.namespace) { container.append(node('p', 'small muted', 'Нажмите «Статистика».')); return; }
+      state.stats.kinds.forEach(kind => container.append(node('div', 'card small', kind.kind + ' · ' + kind.sources + ' записей · ' + kind.chunks + ' чанков')));
+    }
+    function renderLookup(container) {
+      container.replaceChildren();
+      if (!state.lookup.length) { container.append(node('p', 'small muted', 'Список пока пуст.')); return; }
+      state.lookup.forEach(record => {
+        const button = node('button', 'linkbutton', record.source_id + ' · ' + record.title);
+        button.style.display = 'block';
+        button.style.margin = '9px 0';
+        button.dataset.sourceId = record.source_id;
+        container.append(button);
+      });
+    }
+    function render() {
+      all('[data-chat]').forEach(renderMessages);
+      all('[data-results]').forEach(renderResults);
+      all('[data-stats]').forEach(renderStats);
+      all('[data-lookup]').forEach(renderLookup);
+      all('[data-context]').forEach(el => el.textContent = state.context ? state.context.context || 'Контекст пуст.' : 'Контекст появится после поиска.');
+      all('[data-document]').forEach(el => el.textContent = state.document ? JSON.stringify(state.document, null, 2) : 'Выберите результат поиска.');
+      all('[data-response]').forEach(el => el.textContent = state.response ? JSON.stringify(state.response, null, 2) : 'Операций пока нет.');
+      all('[data-more]').forEach(el => el.style.display = state.cursor ? '' : 'none');
+      $('#event-log').textContent = state.log.join('\n') || 'Операций пока нет.';
+      $('#debug-state').textContent = JSON.stringify({
+        variant: state.variant, api_key: state.key ? 'введён (скрыт)' : 'не введён',
+        namespace: state.namespace, mode: state.mode, kinds: state.kinds, filters: state.filters,
+        as_of: state.asOf, query: state.query, messages: state.messages,
+        results: state.results, context: state.context, document: state.document,
+        stats: state.stats, lookup: state.lookup, cursor: state.cursor, response: state.response
+      }, null, 2);
+    }
+    function switchVariant(value) {
+      state.variant = value;
+      all('.variant').forEach(el => el.classList.toggle('active', el.id === 'variant-' + value.toLowerCase()));
+      $('#variant-label').textContent = value + ' · ' + names[value];
+      const url = new URL(location.href);
+      url.searchParams.set('variant', value);
+      history.replaceState(null, '', url);
+      all('[data-query]').forEach(input => input.value = state.query);
+      render();
+    }
+    function cycle(delta) { switchVariant(variants[(variants.indexOf(state.variant) + delta + variants.length) % variants.length]); }
+    document.addEventListener('input', event => {
+      if (event.target.id === 'api-key') state.key = event.target.value;
+      if (event.target.id === 'kinds') state.kinds = event.target.value;
+      if (event.target.id === 'filters') state.filters = event.target.value;
+      if (event.target.id === 'as-of') state.asOf = event.target.value;
+      if (event.target.matches('[data-query]')) state.query = event.target.value;
+    });
+    document.addEventListener('change', event => {
+      if (event.target.id === 'namespace') { state.namespace = event.target.value; state.results = []; state.context = null; state.document = null; state.lookup = []; state.stats = null; render(); }
+      if (event.target.id === 'mode') state.mode = event.target.value;
+    });
+    document.addEventListener('submit', event => {
+      if (event.target.matches('[data-query-form]')) { event.preventDefault(); state.query = event.target.querySelector('[data-query]').value; ask(); }
+    });
+    document.addEventListener('click', event => {
+      const source = event.target.closest('[data-source-id]');
+      if (source) { inspect(source.dataset.sourceId); return; }
+      const action = event.target.closest('[data-action]')?.dataset.action;
+      if (action === 'stats') stats();
+      if (action === 'lookup') lookup(false);
+      if (action === 'more') lookup(true);
+      if (action === 'upsert') upsertScratch();
+      if (action === 'delete') deleteScratch();
+      if (action === 'import') importDataset();
+    });
+    $('#previous').addEventListener('click', () => cycle(-1));
+    $('#next').addEventListener('click', () => cycle(1));
+    document.addEventListener('keydown', event => {
+      if ((event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') || event.target.closest('input, textarea, select, [contenteditable]')) return;
+      event.preventDefault();
+      cycle(event.key === 'ArrowRight' ? 1 : -1);
+    });
+    fetch('/health/ready').then(response => response.json().then(data => {
+      $('#health').textContent = response.ok ? '● Сервис готов' : '● Сервис недоступен';
+    })).catch(() => { $('#health').textContent = '● Сервис недоступен'; });
+    switchVariant(state.variant);
+  </script>
+</body>
+</html>

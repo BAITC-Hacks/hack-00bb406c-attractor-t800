@@ -1,14 +1,18 @@
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from pathlib import Path
+from threading import Lock
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Security
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import APIKeyHeader
 from psycopg.errors import OperationalError
 from psycopg.types.json import Jsonb
 
-from app.config import API_KEY, MODEL_NAME
+from app.config import API_KEY, DATASET_DIR, MODEL_NAME, PROTOTYPE_UI
 from app.db import connection, initialize
+from app.import_dataset import sync_dataset
 from app.models import ContextRequest, Document, DocumentBatch, LookupRequest, SearchRequest
 from app.store import search, upsert
 
@@ -21,6 +25,19 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title="Career Quest RAG Engine", version="0.1.0", lifespan=lifespan)
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+import_lock = Lock()
+
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse(url="/ui" if PROTOTYPE_UI else "/docs")
+
+
+@app.get("/ui", response_class=HTMLResponse, include_in_schema=False)
+def ui():
+    if not PROTOTYPE_UI:
+        raise HTTPException(status_code=404, detail="Prototype UI disabled")
+    return (Path(__file__).parent / "static" / "prototype.html").read_text(encoding="utf-8")
 
 
 def require_key(provided: Annotated[str | None, Security(api_key_header)]) -> None:
@@ -160,3 +177,15 @@ def stats(_: Protected, namespace: str = Query(min_length=1)):
             (namespace,),
         ).fetchall()
     return {"namespace": namespace, "kinds": rows, "as_of": datetime.now(timezone.utc)}
+
+
+@app.post("/v1/import/career-quest")
+def import_career_quest(_: Protected):
+    if not import_lock.acquire(blocking=False):
+        raise HTTPException(status_code=409, detail="Import already running")
+    try:
+        return sync_dataset(Path(DATASET_DIR))
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=422, detail=f"Dataset file not found: {exc.filename}") from exc
+    finally:
+        import_lock.release()

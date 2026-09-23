@@ -116,8 +116,7 @@ def documents(folder: Path):
             )
 
 
-def main():
-    folder = Path(DATASET_DIR)
+def sync_dataset(folder: Path, *, progress: bool = False) -> dict[str, int]:
     initialize()
     seen: set[str] = set()
     changed = 0
@@ -126,7 +125,7 @@ def main():
             result = upsert(conn, doc)
             changed += int(result["changed"])
             seen.add(doc.source_id)
-            if index % 200 == 0:
+            if progress and index % 200 == 0:
                 print(f"Processed {index}, updated {changed}", flush=True)
         stale = conn.execute(
             "SELECT source_id FROM sources WHERE namespace=%s AND kind = ANY(%s::text[])",
@@ -137,7 +136,12 @@ def main():
             if row["source_id"] not in seen:
                 conn.execute("DELETE FROM sources WHERE namespace=%s AND source_id=%s", (NAMESPACE, row["source_id"]))
                 removed += 1
-    print(f"Done: {len(seen)} records, {changed} updated, {removed} removed", flush=True)
+    return {"total": len(seen), "changed": changed, "removed": removed}
+
+
+def main():
+    result = sync_dataset(Path(DATASET_DIR), progress=True)
+    print(f"Done: {result['total']} records, {result['changed']} updated, {result['removed']} removed", flush=True)
 
 
 if __name__ == "__main__":

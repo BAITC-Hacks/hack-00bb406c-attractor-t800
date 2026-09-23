@@ -5,4 +5,5 @@ API_KEY = os.environ.get("RAG_API_KEY", "local-rag-api-key-change-me")
 MODEL_NAME = os.environ.get("EMBEDDING_MODEL", "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
 MODEL_CACHE = os.environ.get("FASTEMBED_CACHE_PATH", "/models")
 DATASET_DIR = os.environ.get("DATASET_DIR", "/dataset")
+PROTOTYPE_UI = os.environ.get("RAG_PROTOTYPE_UI", "0") == "1"
 EMBEDDING_DIMENSION = 384
