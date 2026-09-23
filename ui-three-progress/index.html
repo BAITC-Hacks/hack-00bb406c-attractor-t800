@@ -3,35 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f6f8f5">
+  <meta name="theme-color" content="#f5f3ec">
   <title>Halyk · Мой рост</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23077852'/%3E%3Cpath d='M20 30V17M20 23C8 24 9 12 9 12s12-1 11 11m0-5C19 7 31 7 31 7s1 11-11 11' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="growth.css">
 </head>
 <body>
-  <header class="studio-header"><a class="wordmark" href="/" aria-label="Halyk prototype home"><span class="brand-seal">H</span>Halyk<span class="brand-divider"></span><span class="wordmark-sub">Мой рост</span></a><span class="studio-label"><i></i> INTERACTIVE PROTOTYPE <span> / 01</span></span></header>
-  <div class="studio">
-    <aside class="intro-panel">
-      <div class="eyebrow">ВНУТРИ ВАШЕГО HALYK</div>
-      <h1>Большой путь.<br>Маленькие<br><em>шаги.</em></h1>
-      <p class="intro-copy">Место, где опыт становится видимым, а следующая карьерная цель — ближе.</p>
-      <div class="intro-rule"></div>
-      <div class="concept-row"><span>01</span><div><strong>Корни — ваш стаж</strong><p>Дерево растёт вместе со временем в компании.</p></div></div>
-      <div class="concept-row"><span>02</span><div><strong>Ветви — ваши навыки</strong><p>Тесты и практика открывают новые возможности.</p></div></div>
-      <div class="concept-row"><span>03</span><div><strong>Детали — ваш характер</strong><p>Открывайте за опыт новые темы и виды дерева.</p></div></div>
-      <div class="demo-controls" id="demo-controls"></div>
-    </aside>
-    <section class="device-wrap" aria-label="Интерактивный прототип Halyk">
-      <div class="device" id="device">
-        <div class="statusbar"><strong>9:41</strong><div class="dynamic-island"></div><span class="status-icons">▮▮▮ <svg viewBox="0 0 20 16" width="16" aria-hidden="true"><path d="M2 5Q10-2 18 5M5 8q5-5 10 0M8 11q2-2 4 0" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="14" r="1.2"/></svg><i class="battery"></i></span></div>
-        <div id="app" class="app"><div class="loading">Открываем ваш Halyk…</div></div>
-        <div id="modal-root"></div>
-        <div class="toast" id="toast" role="status" aria-live="polite"></div>
-      </div>
-    </section>
-    <aside class="context-panel" id="context-panel"></aside>
-  </div>
-  <div class="prototype-switcher" id="prototype-switcher" aria-label="Варианты прототипа"></div>
+  <div id="app" class="app"><div class="loading">Открываем ваш Halyk…</div></div>
+  <button id="demo-widget" class="demo-widget" data-action="demo-settings" aria-label="Пульт прототипа — перетащите или нажмите" title="Перетащите · нажмите, чтобы изменить данные"></button>
+  <div id="modal-root"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script type="module" src="app.js"></script>
 </body>
 </html>

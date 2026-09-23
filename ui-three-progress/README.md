@@ -1,113 +1,65 @@
-# Halyk · Мой рост — UI prototype
+# Halyk · Мой рост
 
-**Employee-growth prototype with a working AI test-generation lab.** The banking/career demo is mocked. The test lab can call OpenAI with a key supplied by the user. There is no real login, Jira access, messaging, or persistent storage.
+A full-screen employee-development prototype inside the Halyk SuperApp. Banking, employee data, Jira and video calls are mocked. The question library was generated through OpenAI using the existing specialized prompts.
 
 ## Run
 
-Requires Node.js 20 or newer. No installation or build step.
+Node.js 22+; no dependencies or build step.
 
 ```sh
 cd ui-three-progress
 npm run dev
 ```
 
-Open [localhost:4173](http://localhost:4173). The landing view is the authenticated Halyk banking home. An employee-only **Мой рост** service card opens the mini-app.
+Open [the skill tree](http://localhost:4173/?view=growth) or [Halyk home](http://localhost:4173/). `npm run preview` hides the floating prototype controls. The server listens on loopback only.
 
-For a presentation without the developer variant bar, use `npm run preview`. Set `PORT=4174 npm run dev` if the default port is occupied. The server binds only to the local computer.
+## What to try
 
-## Generate and take real tests
+- **Scroll the tree.** The canvas fills the application; there is no device frame. All 22 skills have their own branches. More skills extend its height without a fixed limit. Passed tests produce filled leaves; unattempted and failed tests remain outlines. Company tenure changes trunk thickness, branch reach and leaf size.
+- **Pass a test.** Each skill has five generated questions, four options per question, a score threshold and explanations. A first passing result adds a leaf and +200 XP. Failure adds neither. Attempts can be paused and resumed in this session. The profile, level and career plan derive from the same state.
+- **Move the settings puck.** Drag the green control anywhere, or focus it and use arrow keys (Shift for larger moves). Click to edit name, role, department, manager, tenure, XP, goal, tree and palette. Changes appear immediately. Add a custom skill to extend the tree; its assigned author must write questions before it can be taken.
+- **Try a 1:1.** Open the meeting action and acknowledge the recording notice for both simulated participants. The clock counts while the call is active, both participants are present and the microphone is enabled. After 15 minutes, employee and team lead each receive +100 XP once. Pause, disconnect, mute, end early, or use the clearly labelled demo fast-forward. The call requests no camera/microphone access and creates no recordings.
+- **Use the career and contribution views.** Change career direction, submit a code review, mentoring or knowledge-sharing contribution, and confirm it with the labelled demo manager action. Jira sync imports one prepared task and prevents duplicate rewards. The career checklist updates from tests, confirmed contributions and completed 1:1s.
+- **Customize the tree.** Oak, apple and pine have distinct leaf shapes. XP unlocks appearance options; tenure determines physical size. The customization view retains the Higgsfield-generated tree previews.
 
-Open [the test lab](http://localhost:4173/test-lab.html), or choose **Тесты → Создать тест с AI** in the mini-app.
+## Navigation
 
-1. Choose a role, level (Junior/Middle/Senior), language (Russian/English/Kazakh), and one or more skills.
-2. Select 5, 10, 15 or 20 questions per skill. Paste an OpenAI API key in the password field. The default model is `gpt-4.1-mini`; an editable model field supports other Responses API models with Structured Outputs, subject to your account's access.
-3. Click **Сгенерировать тест**. Each selected skill makes one separate API request. The page shows progress, keeps completed tests if later requests fail, supports cancellation and allows retrying an individual failed test. Requests are never automatically retried.
-4. Click **Пройти тест**, answer the questions, and finish to see the score and explanations. You can go back, change answers, close/resume an unfinished test, or retake the same questions. Passing requires at least 80% correct. Generate again for new questions.
-5. Download all prompts as JSON or export generated tests **including answer keys**. Everything in the lab resets on page reload. The lab's practice results do not award XP or change the mock employee's OTK, skills or promotion status.
+Halyk retains its original banking tabs. The employee-only **Мой рост** service card opens a dedicated **Дерево / Тесты / Цели / Профиль / Halyk** navigation bar. The last item retains the Halyk return emblem. A guest has no employee entry.
 
-The key stays in the page's memory and is sent to the loopback-only local server, then to `https://api.openai.com/v1/responses`. It is not stored in files, logs, cookies, browser storage or exports. The OpenAI request sets `store: false`. A browser reload/navigation clears the key. Generation uses your OpenAI API project's quota; ChatGPT subscription access alone is not an API key.
+The previous A/B/C study has been replaced by the selected full-screen direction. Existing `?variant=A&view=growth` links still open the tree.
 
-### Roles and prompts
+## Test authors and generated questions
 
-The supplied brief names **Employee, Analyst (result verification), Manager, and HR** as application personas, plus **Senior** as a career level. It does not supply a full job catalogue or a formal competency matrix. Existing demo data adds **Middle Frontend Developer, Senior Frontend Developer, Product Manager, and Frontend Platform Engineer**. All role-to-skill mappings are explicitly proposed prototype content.
+`mock-data.json` is the single fixture document: employees, 22 tests, 110 generated questions, goals, XP, author assignments, mock integrations and visual-reference provenance. Every test references its own question set. The OpenAI model was `gpt-4.1-mini`, with five questions per skill and the existing prompt library. Generation metadata is recorded per test. Some React question conditions were clarified against the official React documentation linked in that metadata.
 
-There are **22 specialized skill prompts**, including all 16 existing demo tests plus 6 proposed skills derived from the brief's responsibilities. System Design, security, APIs, TypeScript, CSS, testing and other skills each get a distinct prompt; the generator does not reuse the old unrelated mock question sets.
+The role switch in the floating controls demonstrates per-test permissions:
 
-- [Complete role matrix and all prompts](test-generation/PROMPTS.md)
-- [Machine-readable prompt library](test-generation/prompt-library.json)
-- Regenerate these artifacts with `npm run prompts:export` after editing the catalogue or prompts.
+| Demo identity | Allowed actions |
+| --- | --- |
+| Employee | Preparation, taking tests, results and explanations |
+| Данияр Алиев | Edit and generate the 12 assigned IT tests |
+| Мадина Омарова | Edit and generate the 10 other assigned tests |
 
-### Backend handoff
+Assigned authors can edit the preparation text, pass threshold, XP, question wording, answer options, correct answer and explanation. They can add questions and open the original prompt generator for that skill. Editing creates a separate in-memory question set for that test. Employees do not get author controls. The author studio rejects employee access, filters its skills by assignment, and the generation endpoint independently checks the selected test.
 
-The test lab is isolated from the original mock app. Modules in `test-generation/` use ES modules and no third-party dependencies:
+**These are prototype permissions.** The `halyk_demo_actor` cookie deliberately allows the demo identity to be switched. It is not authentication. Production must use verified server sessions, persisted author assignments and server-side grading. Static mock data includes answer keys and generated content is not a validated employee assessment.
 
-- `catalog.mjs`: versioned roles, skills, source labels and role mappings.
-- `prompts.mjs`: one specialized template per skill, shared generation instructions, configuration validation and prompt export.
-- `assessment.mjs`: JSON Schema, response validation, option shuffling and deterministic grading.
-- `openai.mjs`: OpenAI transport, timeout, cancellation, refusal/incomplete-output handling and safe errors.
-- `server.mjs`: thin local HTTP adapter; `POST /api/generate-test` accepts `{ apiKey, config: { positionId, skillId, level, language, questionCount, model } }` and returns `{ assessment }` or `{ error }`. Keys are request-scoped; no settings file or environment variable is needed.
+The author studio is at [test-lab.html](http://localhost:4173/test-lab.html). It supports role, level, language, model and question-count settings, cancellation, individual retry, prompt export and test export. It opens separately to preserve the main app's in-memory state; studio practice results do not award career XP.
 
-For the backend move, keep the catalogue, prompt builder and validation modules. Replace the local adapter with the authenticated service, manage provider credentials there, persist test versions and attempts, and return questions without `correct`/`explanation` until grading. The current practice runner receives answer keys in memory and is not an exam-security boundary. AI-generated questions can still be factually ambiguous; review before any formal assessment use.
+The key used to populate the fixture was passed through a terminal with echo disabled directly into the generation process. It was not written to a file or embedded in the client. Subsequent studio requests accept a transient key and send it only to the local adapter and OpenAI, using `store: false`. No key is stored in mocks, cookies, browser storage, exports or Git.
 
-Implementation references: [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) and [GPT-4.1 mini](https://developers.openai.com/api/docs/models/gpt-4.1-mini).
+Prompt sources and exports remain in `test-generation/`. `npm run prompts:export` rebuilds the prompt document and JSON. The optional `node test-generation/generate-fixtures.mjs` command reads one API key from stdin, generates each of the 22 tests sequentially and updates only their fixtures; invoke it deliberately because it makes paid API requests.
 
-### Generation checks
+## Visual direction
 
-Run `npm test` for catalogue coverage, every role/skill prompt, strict schemas, response validation, shuffling, scoring, provider failures, cancellation, timeouts, API-key handling, origin/host protections and static routes. These checks use simulated OpenAI responses and consume no API quota. Real output quality and account/model access require a generation with your own key.
+Higgsfield generated two new UI references in `assets/references/desktop.png` and `mobile.png`. They inform the ivory, ink-green, editorial typography and botanical layout. The live tree is SVG so leaves genuinely follow test state and the map can grow with the skill list. The three earlier Higgsfield tree assets remain in the appearance picker. Images are local; the optional Golos Text font has a system fallback.
 
-Browser verification covers all eight role selectors, generation, partial batch failure, individual retry, cancellation, answer changes, back/resume, pass/fail scoring, retakes, HTML escaping, exports and key clearing. Desktop and 390px mobile layouts were checked for overflow; reload clears the key and tests. To repeat the simulated browser flow on a fresh lab page, run `npx agent-browser open http://localhost:4173/test-lab.html`, then `npx agent-browser eval --stdin < test-generation/browser-smoke.js`. The harness intercepts generation requests and uses a fake key; reload afterwards to clear its sample tests.
+## Verification
 
-## One source of mock data
+`npm test` covers the existing prompt/generation suite plus per-test author permissions and forged body identities. Verification does not consume API quota.
 
-[`mock-data.json`](./mock-data.json) is the single mock-data document, loaded by the UI at startup. It contains fictional employees, the banking-home context, tests and answer keys, role requirements, career goals, XP rules and levels, tree choices, themes, contributions, Jira fixtures and meeting slots. Edit that document and reload the page to change the scenario.
+Browser checks at 390 × 844 and 1280 × 900 covered scrolling, mobile overflow, successful and failed tests, one leaf/+200 XP, draggable controls, immediate profile/role/XP changes, adding a 23rd skill, author editing, employee denial, and scoped author-studio skills. The simulated call was checked before 15 minutes, after eligibility, with duplicate fast-forward, and with an absent participant. Direct model checks exercised the exact 15-minute boundary, muted/disconnected time, duplicate reward prevention, a 120-skill tree and tenure scaling.
 
-The original banking/career demo mutates an in-memory copy. A reload or a profile change restores its starting snapshot. It uses no `localStorage`, cookies or real APIs; the separate test lab described above calls OpenAI. The initial XP is a seeded historical balance; it is not recomputed from the displayed historical sample. New rewards are calculated by the mock UI and awarded only once.
+All app changes and test edits are in memory and reset on reload. Only the switchable demo-identity cookie lasts for the browser session. No production deployment, real video service, HR integration, recording storage or real Jira connection is included.
 
-## Navigation decisions
-
-- The banking app retains its five original navigation items. **Рост is not added to the banking bottom bar.**
-- Employees enter through the **Мой рост** service card or the **Все сервисы** sheet.
-- The employee mini-app has exactly **Дерево / Тесты / Цели / Профиль / Halyk** at the bottom.
-- The rightmost **Halyk** emblem and label follow the return-tab pattern supplied by the user. It returns to banking home and preserves this session's employee progress.
-- A client who is not an employee has no growth entry. Switch the demo profile using the avatar on banking home, the profile settings button, or the desktop demo selector.
-
-## Three layout variants
-
-The mini-app's shared flows remain the same; its home hierarchy changes structurally:
-
-| URL | Direction | Main interaction |
-| --- | --- | --- |
-| [`/?variant=A&view=growth`](http://localhost:4173/?variant=A&view=growth) | Живое дерево | A tree with skill nodes, status counts and the next test |
-| [`/?variant=B&view=growth`](http://localhost:4173/?variant=B&view=growth) | Путь к цели | A vertical career roadmap with actions at each step |
-| [`/?variant=C&view=growth`](http://localhost:4173/?variant=C&view=growth) | Мой фокус | One prominent learning action, followed by the personal garden |
-
-Use the floating prototype bar or the left/right arrow keys to switch. Arrows do not override form controls. The URL retains the chosen variant. The bar is hidden by `npm run preview`.
-
-The desktop side panel exposes the current mock state. Each render also logs `[Halyk prototype state]` to the browser console. No layout winner has been declared; A is the default reference direction.
-
-## Working demo flows
-
-1. **Bank → growth → bank:** open the employee card and use the persistent Halyk return tab.
-2. **Tests:** filter passed/unattempted/failed role tests, search, add optional catalog tests, start a test, change answers, save/resume, finish and inspect answer explanations. A score below the pass threshold allows a retry and gives no XP. A passing test adds +200 XP once and updates the profile and relevant career step.
-3. **Goals:** select promotion to Senior or transfer to Product / Engineering Platform. The roadmap, goal card and profile reflect the saved direction. Goals never automatically trigger a real promotion or transfer.
-4. **Employee record:** inspect the role, tenure, manager, skills, certificates, test history, meetings, contributions and data-access explanation.
-5. **Tree:** preview oak, apple and pine; compare six-month, one-year and two-year sizes; select an earned theme; save. Leaving without saving discards the preview. Tree size uses company tenure (0.65 / 0.85 / 1.0 scale). XP unlocks appearance and is not spent on it.
-6. **XP:** schedule 1:1s, submit code review, mentoring and knowledge-sharing contributions. These remain pending until the explicit, labelled **demo manager confirmation** is used. Employees cannot confirm themselves in the proposed real product.
-7. **Jira:** connect/disconnect and sync a prepared task. Repeated sync does not duplicate the task. A completed Jira task still requires confirmation before XP is awarded.
-8. **Unlocks:** start at 1,240 XP, pass React (+200), then confirm both Jira tasks (+100 each) to reach 1,640 and unlock **Ночной сад** at level 8.
-
-Banking products outside the employee-growth scope open contextual mock sheets, not functional banking workflows.
-
-## Tree artwork
-
-`assets/oak.png`, `assets/apple.png` and `assets/pine.png` were generated through **Higgsfield / GPT Image 2.5** for this prototype. Their job IDs and source URLs are recorded in `mock-data.json`. Assets are committed locally, so generation-service availability is not required to run the demo. Tenure scaling, autumn tint, night lighting and fireflies are rendered by CSS. No external image requests are made by the UI.
-
-The optional Golos Text font is loaded from Google Fonts, with a local system-font fallback. The UI and its data still work without that font request.
-
-## Verification and capture
-
-The original mock prototype was verified in the browser at desktop and 390 × 844 mobile size: entry gating, employee navigation and Halyk return, test save/resume and +200 XP, optional test enrollment, goal changes, scheduled meetings, profile updates, Jira confirmation and duplicate-sync prevention, level-8 theme unlock, saved apple/night customization, six-month tree sizing, and all three layouts. Browser error/warning logs were empty during that checked flow. JavaScript syntax and the mock JSON were also checked. The generation lab now has the automated suite described above.
-
-**Verdict:** the proposed service-card entry and dedicated mini-app navigation make the Halyk return action clear without crowding the banking tab bar. The interactive prototype demonstrates the requested behavior; the final layout choice and production architecture remain open.
-
-Captured on branch **`ui-three-askarbek`**. The changes are isolated in this folder; no production implementation is promoted to main.
+Captured on branch **ui-three-askarbek**.

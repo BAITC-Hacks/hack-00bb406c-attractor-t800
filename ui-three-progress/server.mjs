@@ -4,6 +4,8 @@ import { readFile } from 'node:fs/promises';
 import { dirname, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { generateAssessment, GenerationError } from './test-generation/openai.mjs';
+import fixtures from './mock-data.json' with { type: 'json' };
+import { actorFromCookie, canEditTest } from './growth-model.mjs';
 const root = dirname(fileURLToPath(import.meta.url));
 const production = process.argv.includes('--production');
 const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.md': 'text/plain' };
@@ -17,6 +19,14 @@ return http.createServer(async (req, res) => {
   let pathname;
   try { pathname = decodeURIComponent(new URL(req.url, `http://${host}`).pathname); }
   catch { json(res, 400, { error: 'Некорректный адрес.' }); return; }
+  // Prototype identity only. Production must replace this switchable cookie with
+  // an authenticated server session and persisted per-test author assignments.
+  const actorId = actorFromCookie(req.headers.cookie);
+  if (pathname === '/api/test-access') {
+    if (req.method !== 'GET') { json(res, 405, { error: 'Используйте GET.' }); return; }
+    json(res, 200, { actor: fixtures.access.users.find(user => user.id === actorId) || fixtures.access.users[0], skills: fixtures.tests.filter(test => canEditTest(fixtures, actorId, test.id)).map(test => test.id) });
+    return;
+  }
   if (pathname === '/api/generate-test') {
     if (req.method !== 'POST') { json(res, 405, { error: 'Используйте POST.' }); return; }
     if ((req.headers.origin && req.headers.origin !== `http://${host}`) || req.headers['sec-fetch-site'] === 'cross-site') { json(res, 403, { error: 'Запрос с другого сайта запрещён.' }); return; }
@@ -35,6 +45,7 @@ return http.createServer(async (req, res) => {
       try { payload = JSON.parse(Buffer.concat(chunks).toString()); }
       catch { throw new GenerationError('Некорректный JSON.', 400); }
       if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new GenerationError('Некорректный запрос.', 400);
+      if (!canEditTest(fixtures, actorId, payload.config?.skillId)) throw new GenerationError('Только назначенный автор может генерировать вопросы для этого теста.', 403);
       const assessment = await generate(payload.config, { apiKey: payload.apiKey, signal: controller.signal });
       if (!res.destroyed) json(res, 200, { assessment });
     } catch (error) {

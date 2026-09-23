@@ -1,7 +1,18 @@
-import { SKILLS, POSITIONS, SOURCE_NOTE, LEVELS, LANGUAGES, getSkill, getPosition } from './test-generation/catalog.mjs';
+import { SKILLS, POSITIONS as ALL_POSITIONS, SOURCE_NOTE, LEVELS, LANGUAGES, getSkill } from './test-generation/catalog.mjs';
 import { buildPrompt, exportPromptLibrary, validateConfig, PASS_SCORE } from './test-generation/prompts.mjs';
 import { gradeAssessment } from './test-generation/assessment.mjs';
 
+async function initializeLab() {
+const access = await fetch('/api/test-access').then(response => response.json());
+if (!access.skills?.length) {
+  document.querySelector('.workspace').innerHTML = '<section class="panel access-denied"><div class="eyebrow">ДОСТУП К ТЕСТАМ</div><h1>Студия для авторов.</h1><p>Редактирование вопросов и генерация доступны только назначенным авторам теста.</p><a class="button primary" href="/?view=tests">Вернуться к моим тестам</a><p class="hint">В прототипе роль можно переключить в плавающем пульте. В рабочей системе доступ назначает администратор.</p></section>';
+  document.querySelector('.session-badge').textContent = 'Сотрудник · только прохождение';
+  return;
+}
+const POSITIONS = ALL_POSITIONS.map(position => ({ ...position, skills: position.skills.filter(id => access.skills.includes(id)) })).filter(position => position.skills.length);
+const getPosition = id => POSITIONS.find(position => position.id === id);
+const requestedSkill = new URLSearchParams(location.search).get('skill');
+document.querySelector('.session-badge').textContent = access.actor.name + ' · автор тестов';
 const $ = selector => document.querySelector(selector);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const items = [];
@@ -10,10 +21,10 @@ let controller;
 let activeItem;
 
 $('#position').innerHTML = `<optgroup label="Роли из брифа">${POSITIONS.filter(p => p.source === 'brief').map(option).join('')}</optgroup><optgroup label="Должности из демо">${POSITIONS.filter(p => p.source !== 'brief').map(option).join('')}</optgroup>`;
-$('#position').value = 'middle-frontend';
+$('#position').value = (POSITIONS.find(position => requestedSkill && position.skills.includes(requestedSkill)) || POSITIONS.find(position => position.id === 'middle-frontend') || POSITIONS[0]).id;
 $('#source-note').textContent = SOURCE_NOTE;
 $('#position-sources').innerHTML = ['brief', 'existing-app'].map(source => `<strong>${source === 'brief' ? 'В брифе' : 'В существующем демо'}</strong><ul>${POSITIONS.filter(p => p.source === source).map(p => `<li>${escape(p.title)}<br>${p.skills.map(id => escape(getSkill(id).title)).join(' · ')}</li>`).join('')}</ul>`).join('');
-$('#prompt-count').textContent = `${SKILLS.length} отдельных промптов · ${POSITIONS.length} ролей и должностей`;
+$('#prompt-count').textContent = `${access.skills.length} доступных промптов · ${POSITIONS.length} ролей и должностей`;
 
 function option(item) { return `<option value="${item.id}">${escape(item.title)}</option>`; }
 function selectedSkills() { return [...document.querySelectorAll('#skills input:checked')].map(input => input.value); }
@@ -24,7 +35,7 @@ function updatePosition() {
   const position = getPosition($('#position').value);
   $('#position-description').textContent = position.description;
   $('#level').value = position.level;
-  const initial = position.skills.includes('architecture') ? 'architecture' : position.skills[0];
+  const initial = position.skills.includes(requestedSkill) ? requestedSkill : position.skills.includes('architecture') ? 'architecture' : position.skills[0];
   $('#skills').innerHTML = position.skills.map(id => `<label class="skill-option"><input type="checkbox" value="${id}" ${id === initial ? 'checked' : ''}><span>${escape(getSkill(id).title)}</span></label>`).join('');
   $('#prompt-skill').innerHTML = position.skills.map(id => option(getSkill(id))).join('');
   $('#prompt-skill').value = initial;
@@ -198,3 +209,6 @@ window.addEventListener('pagehide', () => { controller?.abort(); $('#api-key').v
 
 updatePosition();
 renderLibrary();
+
+}
+initializeLab().catch(() => { document.querySelector('.workspace').innerHTML = '<section class="panel access-denied"><h1>Не удалось проверить доступ</h1><p>Перезапустите локальный сервер и обновите страницу.</p><a href="/?view=tests">К тестам</a></section>'; });

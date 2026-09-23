@@ -9,12 +9,12 @@
   <link rel="stylesheet" href="test-lab.css">
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="/?view=tests"><span class="brand-mark">H</span> Halyk <span class="brand-sub">Career Quest</span></a><span class="session-badge"><i></i> Личная практика</span></header>
+  <header class="topbar"><a class="brand" href="/?view=tests"><span class="brand-mark">H</span> Halyk <span class="brand-sub">Career Quest</span></a><span class="session-badge"><i></i> Студия автора</span></header>
   <main class="workspace">
-    <section class="intro"><div class="eyebrow">НАВЫКИ → ПРАКТИКА → СЛЕДУЮЩИЙ ШАГ</div><h1>Проверьте то,<br>что помогает <em>расти.</em></h1><p>Выберите роль и навыки. Получите новые вопросы,<br class="desktop-break"> пройдите тест и разберите каждый ответ.</p></section>
+    <section class="intro"><div class="eyebrow">НАВЫКИ → ПРАКТИКА → СЛЕДУЮЩИЙ ШАГ</div><h1>Хорошие вопросы.<br><em>Осмысленный рост.</em></h1><p>Создавайте вопросы для назначенных вам навыков.<br class="desktop-break"> Промпты учитывают роль, уровень и контекст.</p></section>
     <div class="lab-grid">
       <section class="panel settings" aria-labelledby="settings-title">
-        <div class="section-head"><span class="step">01</span><h2 id="settings-title">Настройте свой тест</h2></div>
+        <div class="section-head"><span class="step">01</span><h2 id="settings-title">Параметры теста</h2></div>
         <form id="generation-form">
           <fieldset id="generation-fields">
             <label class="field">Роль или должность<select id="position" name="position"></select></label>
@@ -33,7 +33,7 @@
         </form>
       </section>
       <div class="right-column">
-        <section class="panel library" aria-labelledby="library-title"><div class="section-head"><span class="step">02</span><div><h2 id="library-title">Ваши тесты</h2><p class="hint">Новые вопросы под вашу роль и уровень</p></div><span class="count" id="test-count">0</span></div><div id="test-library"></div><div class="library-footer"><span class="hint">Тесты и ответы доступны до перезагрузки.</span><button type="button" class="text-button" id="export-tests" disabled>JSON с ответами</button></div></section>
+        <section class="panel library" aria-labelledby="library-title"><div class="section-head"><span class="step">02</span><div><h2 id="library-title">Созданные тесты</h2><p class="hint">Новые вопросы под вашу роль и уровень</p></div><span class="count" id="test-count">0</span></div><div id="test-library"></div><div class="library-footer"><span class="hint">Тесты и ответы доступны до перезагрузки.</span><button type="button" class="text-button" id="export-tests" disabled>JSON с ответами</button></div></section>
         <section class="panel prompt-panel"><div class="section-head"><span class="prompt-icon">✳</span><div><h2>Один навык — один промпт</h2><p class="hint" id="prompt-count"></p></div></div><div class="prompt-toolbar"><label class="field">Посмотреть промпт<select id="prompt-skill" aria-label="Навык для просмотра промпта"></select></label><button class="text-button" id="copy-prompt" type="button">Копировать</button></div><details id="prompt-details"><summary>Открыть полный промпт</summary><pre id="prompt-preview"></pre></details><button type="button" class="button secondary" id="export-prompts">Скачать все промпты · JSON</button><p id="copy-status" class="hint" role="status"></p></section>
         <details class="source-panel"><summary>Откуда взяты роли и навыки</summary><p id="source-note"></p><div id="position-sources"></div><p>Прохождение теста помогает выбрать следующий шаг. Оно не меняет ОТК, XP или решение о повышении.</p></details>
       </div>

@@ -20,7 +20,7 @@ test('local generation endpoint passes credentials transiently and returns only 
     assert.ok(signal instanceof AbortSignal);
     return { id: 'test', questions: [] };
   });
-  const response = await fetch(`${url}/api/generate-test`, { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: url }, body: JSON.stringify({ apiKey: 'sk-example', config: { skillId: 'architecture' } }) });
+  const response = await fetch(`${url}/api/generate-test`, { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: url, Cookie: 'halyk_demo_actor=daniyar' }, body: JSON.stringify({ apiKey: 'sk-example', config: { skillId: 'architecture' } }) });
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('cache-control'), 'no-store');
   assert.deepEqual(await response.json(), { assessment: { id: 'test', questions: [] } });
@@ -55,7 +55,7 @@ test('reject cross-origin requests, DNS rebinding, non-JSON and invalid bodies b
 test('server preserves safe provider errors and hides unexpected internals', async t => {
   let safe = true;
   const url = await serverFixture(t, async () => { if (safe) throw new GenerationError('Проверьте ключ.', 401); throw new Error('sk-secret'); });
-  const options = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' };
+  const options = { method: 'POST', headers: { 'Content-Type': 'application/json', Cookie: 'halyk_demo_actor=daniyar' }, body: JSON.stringify({config:{skillId:'react'}}) };
   let response = await fetch(`${url}/api/generate-test`, options);
   assert.equal(response.status, 401);
   assert.deepEqual(await response.json(), { error: 'Проверьте ключ.' });
@@ -76,4 +76,21 @@ test('serves lab and portable ES modules; malformed URL does not crash server', 
   assert.equal((await fetch(`${url}/%E0%A4%A`)).status, 400);
   assert.equal((await fetch(`${url}/.env`)).status, 403);
   assert.equal((await fetch(`${url}/test-lab.html`)).status, 200);
+});
+
+test('author permissions apply per test and cannot be supplied in the request body', async t => {
+  let calls = 0;
+  const url = await serverFixture(t, async () => { calls++; return {id:'generated'}; });
+  const run = (cookie, skillId, extra={}) => fetch(`${url}/api/generate-test`, {method:'POST',headers:{'Content-Type':'application/json', Cookie:cookie},body:JSON.stringify({config:{skillId},...extra})});
+  assert.equal((await run('', 'react', {actorId:'daniyar'})).status, 403);
+  assert.equal((await run('halyk_demo_actor=employee','react')).status, 403);
+  assert.equal((await run('halyk_demo_actor=madina','react')).status, 403);
+  assert.equal((await run('halyk_demo_actor=daniyar','career')).status, 403);
+  assert.equal((await run('halyk_demo_actor=daniyar','react')).status, 200);
+  assert.equal((await run('halyk_demo_actor=madina','career')).status, 200);
+  assert.equal(calls, 2);
+  const employee = await fetch(url+'/api/test-access').then(r=>r.json());
+  assert.deepEqual(employee.skills, []);
+  const author = await fetch(url+'/api/test-access',{headers:{Cookie:'halyk_demo_actor=daniyar'}}).then(r=>r.json());
+  assert.ok(author.skills.includes('react')); assert.ok(!author.skills.includes('career'));
 });
