@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { activityFormat } from './activityFormat';
 
 export default function Recommendations({ profile, api, onOpen, busy }) {
   const [result, setResult] = useState(null);
@@ -23,7 +24,7 @@ export default function Recommendations({ profile, api, onOpen, busy }) {
       {result.mode === 'no_step' && <><ul>{Object.entries(result.excluded_reasons).map(([reason, count]) => <li key={reason}>{reason} ({count})</li>)}</ul><a href="#skills">Посмотреть траекторию и требования</a></>}
       <div className="recommendation-list">{result.recommendations.map((card, index) => <article className="activity-detail" key={card.event_id}>
         <h4>{index + 1}. {card.title}</h4>
-        <p>{card.format === 'self_paced' ? 'В своём темпе' : card.format === 'offline' ? 'Очно' : 'Онлайн'} · {card.duration_hours} ч · {card.nearest_date}</p>
+        <p>{activityFormat[card.format] || card.format} · {card.duration_hours} ч · {card.nearest_date}</p>
         <p><strong>Почему этот шаг:</strong> {card.priority_explanation.join(' ')}</p>
         <ul>{card.explanation.map(text => <li key={text}>{text}</li>)}</ul>
         <p>Прогноз «если завершить». Источник: каталог {result.dataset_version}, {card.event_id}.</p>

@@ -1,4 +1,5 @@
 """Responses API adapter; no retries, raw prompts, or provider errors in logs."""
+import asyncio
 import json
 import os
 import httpx
@@ -7,6 +8,23 @@ from app.application.recommendations import ModelUnavailable, REASONS
 
 class OpenAIRecommendationModel:
     model = 'gpt-4.1-mini-2025-04-14'
+
+    async def readiness(self):
+        key = os.environ.get('OPENAI_API_KEY', '').strip()
+        if not key:
+            return 'missing_key'
+        try:
+            async with asyncio.timeout(2):
+                async with httpx.AsyncClient(timeout=2) as client:
+                    response = await client.get(f'https://api.openai.com/v1/models/{self.model}', headers={'Authorization': f'Bearer {key}'})
+                    response.raise_for_status()
+                    return 'model_accessible' if response.json().get('id') == self.model else 'invalid_response'
+        except (TimeoutError, httpx.TimeoutException):
+            return 'timeout'
+        except httpx.HTTPError:
+            return 'provider_error'
+        except (ValueError, TypeError, AttributeError):
+            return 'invalid_response'
 
     async def select(self, context):
         key = os.environ.get('OPENAI_API_KEY', '').strip()

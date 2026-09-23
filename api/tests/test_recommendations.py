@@ -77,7 +77,10 @@ class RecommendationApiTests(unittest.TestCase):
         for forbidden in ('employee_id', 'full_name', 'manager_id', 'record_id', 'E0174', 'title', 'description'):
             self.assertNotIn(forbidden, serialized)
         self.assertEqual(context['current']['grade'], 'Junior')
+        self.assertTrue(context['requirements'])
+        self.assertTrue(all('required_level' in r and 'calculated_level' in r for r in context['requirements']))
         for candidate in context['candidates']:
+            self.assertTrue(candidate['gain_rules'])
             self.assertTrue(all(e['gap_after'] < e['gap_before'] for e in candidate['effects']))
             self.assertNotEqual(candidate['event_id'], 'EV_001')
 
@@ -186,3 +189,56 @@ class RecommendationApiTests(unittest.TestCase):
                 if index == 0:
                     self.assertNotIn('EV_034', ids)
             print(f'Cold synthetic profile {index}: {result["elapsed_ms"]}ms, {result["mode"]}')
+
+    def test_no_step_distinguishes_completed_from_expired(self):
+        from datetime import date
+        from app.models import Event, ActivityHistory
+        for event in self.db.query(Event).all():
+            event.mandatory = event.event_id != 'EV_032'
+        event = self.db.get(Event, 'EV_032')
+        event.upcoming_sessions = ['2026-09-01']
+        self.db.flush()
+        expired = self.recommendations()
+        self.assertEqual(expired['mode'], 'no_step')
+        self.assertIn('Нет будущей незавершённой сессии', expired['excluded_reasons'])
+        self.db.add(ActivityHistory(record_id='TEST_COMPLETED_032', employee_id='E0174', event_id='EV_032', date=date(2026, 9, 1), status='completed', completion_pct=100, assigned_by='self'))
+        self.db.flush()
+        completed = self.recommendations()
+        self.assertEqual(completed['mode'], 'no_step')
+        self.assertIn('Активность уже завершена', completed['excluded_reasons'])
+
+    def test_empty_catalog_has_a_reason(self):
+        from app.models import Event, ActivityHistory
+        self.db.query(ActivityHistory).delete()
+        self.db.query(Event).delete()
+        self.db.flush()
+        result = self.recommendations()
+        self.assertEqual(result['mode'], 'no_step')
+        self.assertEqual(result['excluded_reasons'], {'Каталог активностей пуст': 1})
+
+    def test_startup_reports_key_and_model_access_without_claiming_generation(self):
+        import httpx
+        from unittest.mock import AsyncMock
+        with TestClient(app) as client:
+            self.assertEqual(client.get('/api/health').json()['ai_readiness'], 'missing_key')
+        model = 'gpt-4.1-mini-2025-04-14'
+        response = httpx.Response(200, request=httpx.Request('GET', f'https://api.openai.com/v1/models/{model}'), json={'id': model})
+        with patch.dict(os.environ, {'OPENAI_API_KEY': 'test-only-key'}), patch('httpx.AsyncClient.get', AsyncMock(return_value=response)):
+            with TestClient(app) as client:
+                self.assertEqual(client.get('/api/health').json()['ai_readiness'], 'model_accessible')
+        with patch.dict(os.environ, {'OPENAI_API_KEY': 'test-only-key'}), patch('httpx.AsyncClient.get', AsyncMock(side_effect=httpx.ConnectError('offline'))):
+            with TestClient(app) as client:
+                self.assertEqual(client.get('/api/health').json()['ai_readiness'], 'provider_error')
+
+    def test_completed_event_is_excluded_even_with_conflicting_active_participation(self):
+        from datetime import date
+        from app.models import ActivityHistory
+        from unittest.mock import AsyncMock
+        from app.infrastructure.openai_recommendations import OpenAIRecommendationModel
+        for status in ('completed', 'planned'):
+            self.db.add(ActivityHistory(record_id=f'TEST_CONFLICT_{status}', employee_id='E0174', event_id='EV_032', date=date(2026, 9, 1) if status == 'completed' else date(2026, 10, 15), status=status, completion_pct=100 if status == 'completed' else 0, assigned_by='self'))
+        self.db.flush()
+        model = AsyncMock(return_value={})
+        with patch.object(OpenAIRecommendationModel, 'select', model):
+            self.recommendations()
+        self.assertNotIn('EV_032', [c['event_id'] for c in model.call_args.args[0]['candidates']])

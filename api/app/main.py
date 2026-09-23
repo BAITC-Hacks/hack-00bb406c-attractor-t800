@@ -1,8 +1,11 @@
 from typing import Literal
+from contextlib import asynccontextmanager
+from app.infrastructure.openai_recommendations import OpenAIRecommendationModel
 from app.application.activities import ActivityService
 from app.domain.activities import ActivityConflict
 from app.infrastructure.sql_activities import SqlActivityRepository
 from fastapi.responses import JSONResponse
+import logging
 import hashlib
 import hmac
 import secrets
@@ -17,7 +20,18 @@ from app.models import DemoClock, DemoSession, Employee
 from app.application.profiles import ProfileService
 from app.infrastructure.sql_profiles import SqlProfileRepository
 
-app = FastAPI(title="Career Quest API", version="0.1.0")
+logging.basicConfig(level=logging.INFO, format='%(levelname)s %(name)s %(message)s')
+# Do not log outbound provider request details or request/response bodies.
+logging.getLogger('httpx').setLevel(logging.WARNING)
+@asynccontextmanager
+async def lifespan(app):
+    model = OpenAIRecommendationModel()
+    app.state.ai_readiness = await model.readiness()
+    logging.getLogger(__name__).info('AI startup model=%s readiness=%s', model.model, app.state.ai_readiness)
+    yield
+
+
+app = FastAPI(title="Career Quest API", version="0.1.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:8080"], allow_credentials=True, allow_methods=["GET", "POST", "DELETE"], allow_headers=["Content-Type", "X-CSRF-Token"])
 COOKIE = "cq_session"
 
@@ -52,7 +66,7 @@ class ClockUpdate(BaseModel):
 @app.get("/api/health")
 def health(db: Session = Depends(get_db)):
     clock = db.get(DemoClock, 1)
-    return {"status": "ok", "dataset_version": "1.0", "as_of_date": clock.as_of_date if clock else None}
+    return {"status": "ok", "dataset_version": "1.0", "as_of_date": clock.as_of_date if clock else None, "ai_readiness": getattr(app.state, "ai_readiness", "not_checked")}
 
 @app.get("/api/demo/accounts")
 def demo_accounts(db: Session = Depends(get_db)):
@@ -161,5 +175,4 @@ def recommendations(employee_id: str = Depends(activity_employee), db: Session =
     # coroutine has an overall cancellable deadline, including slow responses.
     import asyncio
     from app.application.recommendations import RecommendationService
-    from app.infrastructure.openai_recommendations import OpenAIRecommendationModel
     return asyncio.run(RecommendationService(SqlActivityRepository(db), OpenAIRecommendationModel()).recommend(employee_id))

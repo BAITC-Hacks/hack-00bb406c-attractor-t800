@@ -7,8 +7,8 @@ from time import monotonic
 from typing import Protocol
 
 from app.application.activities import ActivityService
-from app.domain.activities import ActivityConflict, available_sessions
-from app.domain.trajectory import day
+from app.domain.activities import ActivityConflict
+from app.domain.trajectory import REPEATABLE_EVENTS, day
 
 RULES_VERSION = '1.0'
 MODEL_BUDGET_SECONDS = 8
@@ -43,17 +43,26 @@ def build_candidates(repository, employee_id):
     candidates, excluded = [], Counter()
     today = day(profile['as_of_date'])
     for event in catalog:
+        if event['event_id'] not in REPEATABLE_EVENTS and any(h['event_id'] == event['event_id'] and h['status'] == 'completed' for h in profile['history']):
+            excluded['Активность уже завершена'] += 1
+            continue
         try:
             card = service.card(event, profile, catalog)
+            active = card['participation']
+            if active and any(h['event_id'] == event['event_id'] and h['status'] == 'completed' and day(h['date']) == day(active['date']) for h in profile['history']):
+                excluded['Сессия существующего участия уже завершена'] += 1
+                continue
             # An old active participation can still be completed, but is not a
             # new recommendation when its scheduled session has already passed.
             if event['format'] != 'self_paced' and card['participation'] and day(card['participation']['date']) < today:
                 excluded['Сессия существующего участия уже прошла'] += 1
                 continue
-            if not card['participation'] and not available_sessions(event, profile):
-                continue
         except ActivityConflict as exc:
-            excluded[str(exc)] += 1
+            reason = str(exc)
+            if reason == 'Нет доступной сессии или активность уже завершена':
+                completed = any(h['event_id'] == event['event_id'] and h['status'] == 'completed' for h in profile['history'])
+                reason = 'Активность уже завершена' if completed and event['event_id'] not in REPEATABLE_EVENTS else 'Нет будущей незавершённой сессии'
+            excluded[reason] += 1
             continue
         projected = {s['skill_id']: s for s in card['forecast']['skills']}
         effects = [dict(skill_id=s['skill_id'], name=s['name'], before=s['calculated_level'],
@@ -80,6 +89,8 @@ def build_candidates(repository, employee_id):
                                history=counts, history_dates=[{'status': h['status'], 'date': str(h['date'])} for h in history],
                                recent_missed=missed, score=score, allowed_reasons=codes,
                                gain_rules=event['develops_skills'], activity_url=f"/api/me/activities/{event['event_id']}"))
+    if not catalog:
+        excluded['Каталог активностей пуст'] = 1
     for candidate in candidates:
         alternatives = [{'event_id': c['event_id'], 'recent_missed': c['recent_missed']} for c in candidates if c['recent_missed'] >= 2 and c['event_id'] != candidate['event_id']]
         candidate['history_alternatives'] = alternatives if candidate['recent_missed'] == 0 else []
@@ -91,8 +102,9 @@ def build_candidates(repository, employee_id):
 def model_context(profile, candidates):
     # Allowlist: never send names, employee IDs, managers, work evidence or raw records.
     keys = ('event_id', 'format', 'duration_hours', 'nearest_date', 'history', 'history_dates',
-            'recent_missed', 'score', 'allowed_reasons', 'history_alternatives')
+            'recent_missed', 'score', 'allowed_reasons', 'history_alternatives', 'gain_rules')
     return {'current': {k: profile['employee'][k] for k in ('role', 'grade')},
+            'requirements': [{k: s[k] for k in ('skill_id', 'calculated_level', 'required_level', 'critical', 'gap')} for s in profile['trajectory']['skills'] if s['required_level'] is not None],
             'target': profile['trajectory']['target'], 'as_of_date': str(profile['as_of_date']),
             'candidates': [{**{k: c[k] for k in keys}, 'effects': [{k: v for k, v in e.items() if k != 'name'} for e in c['effects']]} for c in candidates]}
 
@@ -126,7 +138,7 @@ def explain(candidate, profile, reasons):
     for effect in candidate['effects']:
         facts.append(f"{effect['name']}: сейчас {effect['before']}, требуется {effect['required']}; если завершить — {effect['after']}, разрыв {effect['gap_before']} → {effect['gap_after']}." + (' Критическое требование.' if effect['critical'] else ''))
     for alternative in candidate['history_alternatives']:
-        facts.append(f"У {alternative['event_id']} пропусков/отказов за 180 дней: {alternative['recent_missed']}; этот шаг предлагает другую активность, не отменяя оставшиеся разрывы.")
+        facts.append(f"У {alternative['event_id']} пропусков/отказов за 180 дней: {alternative['recent_missed']}; это другой следующий шаг к тому же ориентиру, а не замена развития навыков пропущенной активности.")
     return {**candidate, 'reason_codes': reasons, 'priority_explanation': [REASONS[r] for r in reasons], 'explanation': facts}
 
 
@@ -154,10 +166,12 @@ class RecommendationService:
                 ordered = sorted(candidates, key=lambda c: (-c['score'], c['nearest_date'], c['duration_hours'], c['event_id']))
                 rows = [{'event_id': c['event_id'], 'reasons': c['allowed_reasons']} for c in ordered[:3]]
         by_id = {c['event_id']: c for c in candidates}
-        elapsed = round((monotonic() - started) * 1000)
-        logger.info('recommendations mode=%s rules=%s dataset=%s model=%s elapsed_ms=%s failure=%s ids=%s', mode, RULES_VERSION, profile['dataset_version'], self.model.model, elapsed, failure, [r['event_id'] for r in rows])
-        return {'mode': mode, 'label': {'ai': 'AI: рекомендации модели', 'rules': 'Подбор по правилам; AI сейчас недоступен', 'no_step': 'Сейчас нет подходящей активности из каталога — без шага'}[mode],
-                'fallback_reason': failure, 'elapsed_ms': elapsed, 'rules_version': RULES_VERSION,
+        result = {'mode': mode, 'label': {'ai': 'AI: рекомендации модели', 'rules': 'Подбор по правилам; AI сейчас недоступен', 'no_step': 'Сейчас нет подходящей активности из каталога — без шага'}[mode],
+                'fallback_reason': failure, 'rules_version': RULES_VERSION,
                 'model_version': self.model.model, 'dataset_version': profile['dataset_version'],
                 'target': profile['trajectory']['target'], 'excluded_reasons': excluded if not candidates else {},
                 'recommendations': [explain(by_id[r['event_id']], profile, r['reasons']) for r in rows]}
+
+        result['elapsed_ms'] = round((monotonic() - started) * 1000)
+        logger.info('recommendations mode=%s rules=%s dataset=%s model=%s elapsed_ms=%s failure=%s ids=%s', mode, RULES_VERSION, profile['dataset_version'], self.model.model, result['elapsed_ms'], failure, [r['event_id'] for r in rows])
+        return result

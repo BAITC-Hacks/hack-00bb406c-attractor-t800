@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { activityFormat } from './activityFormat';
 import Recommendations from './Recommendations';
 
 export default function Activities({ profile, api, onRefresh }) {
@@ -63,7 +64,7 @@ export default function Activities({ profile, api, onRefresh }) {
     {!cards && !error && <p role="status">Загружаем доступные активности…</p>}
     {cards?.length === 0 && <p>Сейчас нет доступных активностей из каталога для вашей роли, грейда и истории.</p>}
     <Recommendations profile={profile} api={api} onOpen={openRecommendation} busy={busy}/>
-    <div className="activity-list">{cards?.map(card => <button key={card.event_id} className={`activity-choice ${selected?.event_id === card.event_id ? 'selected' : ''}`} aria-pressed={selected?.event_id === card.event_id} disabled={busy} onClick={() => open(card)}><b>{card.title}</b><span>{card.duration_hours} ч · {card.format === 'self_paced' ? 'В своём темпе' : card.format === 'offline' ? 'Очно' : 'Онлайн'}{card.participation ? ` · ${card.participation.status === 'planned' ? 'Запланировано' : 'В процессе'}` : ''}</span></button>)}</div>
+    <div className="activity-list">{cards?.map(card => <button key={card.event_id} className={`activity-choice ${selected?.event_id === card.event_id ? 'selected' : ''}`} aria-pressed={selected?.event_id === card.event_id} disabled={busy} onClick={() => open(card)}><b>{card.title}</b><span>{card.duration_hours} ч · {activityFormat[card.format] || card.format}{card.participation ? ` · ${card.participation.status === 'planned' ? 'Запланировано' : 'В процессе'}` : ''}</span></button>)}</div>
     {selected && cards && <article id="activity-detail" className="activity-detail" aria-label={selected.title}>
       <h3>{selected.title}</h3><p>{selected.description}</p>
       <p>{participation ? `Ваша сессия: ${participation.date}` : selected.format === 'self_paced' ? 'Доступно в своём темпе с текущей даты сценария.' : 'Выберите доступную сессию.'}</p>
