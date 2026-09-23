@@ -227,3 +227,6 @@ app.include_router(result_router(get_db, current_session))
 
 from app.score_routes import router as score_router
 app.include_router(score_router(get_db, current_session))
+
+from app.development_consents import router as consent_router
+app.include_router(consent_router(get_db, current_session))

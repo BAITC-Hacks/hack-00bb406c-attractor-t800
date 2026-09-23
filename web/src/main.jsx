@@ -7,6 +7,7 @@ import Activities from './Activities';
 import HrDashboard from './HrDashboard';
 import ImportPanel from './ImportPanel';
 import WorkGoals from './WorkGoals';
+import DevelopmentConsents from './DevelopmentConsents';
 import WorkResults from './WorkResults';
 import WorkScores from './WorkScores';
 
@@ -104,6 +105,7 @@ function App() {
         <WorkScores api={api} revision={workRevision}/>
         <WorkGoals key={`${person.employee_id}-${workRevision}`} api={api} actor={actor}/>
         <WorkResults key={person.employee_id} api={api} actor={actor} onChange={() => setWorkRevision(v => v + 1)}/>
+        <DevelopmentConsents key={person.employee_id} api={api} actor={actor}/>
         <Trajectory profile={profile}/>
         <Activities key={person.employee_id} profile={profile} api={api} onRefresh={() => refreshProfile(actor)}/>
         <section className="section-heading history-heading"><div><div className="eyebrow">ВАШИ ДАННЫЕ ИЗ НАБОРА</div><h2>История активностей</h2></div><span className="history-total">{profile.history_count} записей</span></section>
