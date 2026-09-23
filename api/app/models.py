@@ -74,3 +74,27 @@ class DemoClock(Base):
     __tablename__ = "demo_clock"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     as_of_date: Mapped[date] = mapped_column(Date, nullable=False)
+
+class WorkGoal(Base):
+    __tablename__ = 'work_goals'
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    employee_id: Mapped[str] = mapped_column(ForeignKey('employees.employee_id'), index=True)
+    period: Mapped[str] = mapped_column(String, nullable=False)
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    due_date: Mapped[date] = mapped_column(Date, nullable=False)
+    unit: Mapped[str] = mapped_column(String, nullable=False)
+    target: Mapped[float] = mapped_column(Float, nullable=False)
+    task_id: Mapped[str] = mapped_column(String, nullable=False)
+    status: Mapped[str] = mapped_column(String, nullable=False, default='proposed')
+    proposed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+class WorkPlan(Base):
+    __tablename__ = 'work_plans'
+    employee_id: Mapped[str] = mapped_column(ForeignKey('employees.employee_id'), primary_key=True)
+    period: Mapped[str] = mapped_column(String, primary_key=True)
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+    approved_by: Mapped[str] = mapped_column(ForeignKey('employees.employee_id'), nullable=False)
+    approved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    goals: Mapped[list] = mapped_column(JSON, nullable=False)
+    rules: Mapped[dict] = mapped_column(JSON, nullable=False)

@@ -5,10 +5,11 @@ import './style.css';
 import Trajectory from './Trajectory';
 import Activities from './Activities';
 import HrDashboard from './HrDashboard';
+import WorkGoals from './WorkGoals';
 
 async function api(path, options = {}) {
   const response = await fetch(path, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
-  if (!response.ok) { const body = await response.json().catch(() => ({})); throw new Error(body.detail || `Ошибка сервера (${response.status})`); }
+  if (!response.ok) { const body = await response.json().catch(() => ({})); throw new Error(Array.isArray(body.detail) ? body.detail.map(item => item.msg).join('; ') : body.detail || `Ошибка сервера (${response.status})`); }
   return response.json();
 }
 
@@ -93,6 +94,7 @@ function App() {
         {error && <div className="error-box">{error}</div>}
         <section className="hero-panel"><div className="hero-copy"><div className="hero-kicker"><Sparkles size={15}/> КАРЬЕРНАЯ ТРАЕКТОРИЯ</div><h2>{person.career_goal ? <>Шаг за шагом<br/>к новой <em>роли.</em></> : <>Ваш путь<br/>в <em>развитии.</em></>}</h2><p>{person.career_goal ? <>Цель: <b>{profile.employee.goal_label}</b>. Посмотрите, какие навыки помогут приблизиться к ней.</> : <>Карьерная цель пока не выбрана. Профиль и фактическая история уже здесь — следующий шаг можно определить позже.</>}</p><a className="hero-link" href="#skills">Посмотреть навыки <ArrowRight size={17}/></a></div><div className="hero-art"><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="orbit orbit-three"/><div className="route-dot dot-a"/><div className="route-dot dot-b"/><div className="route-dot dot-c"/><div className="route-dot dot-d"/><div className="hero-center"><Compass size={42} strokeWidth={1.2}/></div><div className="art-label label-top">ВАШ МАРШРУТ</div><div className="art-label label-bottom">ОДИН ШАГ ЗА РАЗ</div></div></section>
         <section className="metric-grid"><article className="metric-card"><div className="metric-icon mint"><GraduationCap size={19}/></div><div className="metric-title">ЗАВЕРШЕНО АКТИВНОСТЕЙ</div><div className="metric-value">{completed}<span> / {profile.history_count}</span></div><div className="metric-caption">из истории набора</div></article><article className="metric-card"><div className="metric-icon lilac"><Compass size={19}/></div><div className="metric-title">ТЕКУЩИЙ УРОВЕНЬ</div><div className="metric-value">{person.grade}</div><div className="metric-caption">{person.role}</div></article><article className="metric-card goal-metric"><div className="metric-icon peach"><Sparkles size={18}/></div><div className="metric-title">КАРЬЕРНАЯ ЦЕЛЬ</div><div className="goal-value">{profile.employee.goal_label || 'Пока не выбрана'}</div><div className="metric-caption">{profile.employee.goal_label ? 'Ваш ориентир' : 'Можно определить позже'}</div></article></section>
+        <WorkGoals key={person.employee_id} api={api} actor={actor}/>
         <Trajectory profile={profile}/>
         <Activities key={person.employee_id} profile={profile} api={api} onRefresh={() => refreshProfile(actor)}/>
         <section className="section-heading history-heading"><div><div className="eyebrow">ВАШИ ДАННЫЕ ИЗ НАБОРА</div><h2>История активностей</h2></div><span className="history-total">{profile.history_count} записей</span></section>

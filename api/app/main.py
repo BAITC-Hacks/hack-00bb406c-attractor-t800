@@ -193,3 +193,28 @@ def hr_summary(department: str | None = None, session: DemoSession = Depends(cur
         return HrService(SqlHrRepository(db)).summary(department)
     except UnknownDepartment as exc:
         raise HTTPException(404, str(exc)) from exc
+
+# The actor is always derived from the server-side session, never from payloads.
+from app.application import work_goals
+from fastapi import Path
+
+@app.get('/api/me/work-goals')
+def my_work_goals(employee_id: str = Depends(activity_employee), db: Session = Depends(get_db)):
+    return work_goals.read(db, employee_id)
+
+@app.post('/api/me/work-goals')
+def propose_work_goal(payload: work_goals.Proposal, employee_id: str = Depends(activity_employee), db: Session = Depends(get_db)):
+    return work_goals.propose(db, employee_id, payload)
+
+@app.get('/api/manager/work-goals')
+def team_work_goals(session: DemoSession = Depends(current_session), db: Session = Depends(get_db)):
+    if session.actor_role != 'manager':
+        raise HTTPException(403, 'Доступно только руководителю')
+    return [work_goals.read(db, row.employee_id) | {'full_name': row.full_name}
+            for row in db.query(Employee).filter_by(manager_id=session.employee_id).order_by(Employee.full_name)]
+
+@app.post('/api/manager/employees/{employee_id}/work-plans/{period}/approve')
+def approve_work_plan(employee_id: str, payload: work_goals.Approval,
+                      period: str = Path(pattern=r'^20\d{2}-Q[1-4]$'),
+                      session: DemoSession = Depends(current_session), db: Session = Depends(get_db)):
+    return work_goals.approve(db, session, employee_id, period, payload)

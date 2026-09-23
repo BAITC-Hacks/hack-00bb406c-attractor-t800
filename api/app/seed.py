@@ -1,6 +1,7 @@
 import csv
 import json
 from datetime import date
+from app.application.work_goals import seed_work_plan
 from app.config import DATASET_PATH
 from app.db import SessionLocal
 from app.models import ActivityHistory, DatasetState, DemoClock, Employee, Event, RoleProfile, Skill
@@ -19,6 +20,7 @@ def seed():
     db = SessionLocal()
     try:
         if db.get(DatasetState, "official_dataset_v1"):
+            seed_work_plan(db)
             return
         # Seed the immutable starter kit only once. Future container starts retain all state.
         for row in employees:
@@ -47,6 +49,7 @@ def seed():
         db.add(DatasetState(key="official_dataset_v1", value="1.0"))
         db.add(DemoClock(id=1, as_of_date=date(2026, 10, 1)))
         db.commit()
+        seed_work_plan(db)
     except Exception:
         db.rollback()
         raise
