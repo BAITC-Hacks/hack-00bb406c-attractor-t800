@@ -2,10 +2,12 @@
   "name": "halyk-tree-progress-prototype",
   "version": "0.1.0",
   "private": true,
-  "description": "Throwaway employee-growth UI prototype with one mock-data document",
+  "description": "Employee-growth prototype and OpenAI skill-test generation lab",
   "scripts": {
     "dev": "node server.mjs",
     "start": "node server.mjs",
-    "preview": "node server.mjs --production"
+    "preview": "node server.mjs --production",
+    "test": "node --test test-generation/*.test.mjs",
+    "prompts:export": "node test-generation/export-prompts.mjs"
   }
 }
