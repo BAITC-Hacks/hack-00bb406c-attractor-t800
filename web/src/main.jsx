@@ -4,6 +4,7 @@ import { ArrowDownLeft, ArrowLeft, ArrowRight, CalendarDays, ChevronDown, Circle
 import './style.css';
 import Trajectory from './Trajectory';
 import Activities from './Activities';
+import HrDashboard from './HrDashboard';
 
 async function api(path, options = {}) {
   const response = await fetch(path, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
@@ -13,6 +14,13 @@ async function api(path, options = {}) {
 
 function App() {
   const [actor, setActor] = useState(null);
+  const [path, setPath] = useState(window.location.pathname);
+  function navigate(nextPath) { window.history.pushState({}, '', nextPath); setPath(nextPath); }
+  useEffect(() => {
+    const updatePath = () => setPath(window.location.pathname);
+    window.addEventListener('popstate', updatePath);
+    return () => window.removeEventListener('popstate', updatePath);
+  }, []);
   const [accounts, setAccounts] = useState([]);
   const [profile, setProfile] = useState(null);
   const [query, setQuery] = useState('');
@@ -23,6 +31,7 @@ function App() {
 
   async function refreshProfile(session) {
     if (!session) { setProfile(null); return; }
+    if (session.actor_role === 'hr') { setProfile(null); return; }
     if (session.actor_role === 'operator') {
       setProfile(null);
       try { setClock((await api('/api/operator/clock')).as_of_date); } catch {}
@@ -42,9 +51,9 @@ function App() {
   useEffect(() => { initialize(); }, []);
   const filtered = useMemo(() => accounts.filter(x => `${x.full_name} ${x.employee_id} ${x.role} ${x.department}`.toLowerCase().includes(query.toLowerCase())), [accounts, query]);
 
-  async function login(employee_id, operator = false) {
+  async function login(employee_id, operator = false, actor_role = null) {
     setError(''); setLoading(true);
-    try { await api('/api/demo/login', { method: 'POST', body: JSON.stringify({ employee_id, operator }) }); const session = await api('/api/session'); setActor(session); await refreshProfile(session); }
+    try { await api('/api/demo/login', { method: 'POST', body: JSON.stringify({ employee_id, operator, actor_role }) }); const session = await api('/api/session'); setActor(session); await refreshProfile(session); navigate(session.actor_role === 'hr' ? '/hr' : '/'); }
     catch (e) { setError(e.message); }
     finally { setLoading(false); }
   }
@@ -65,9 +74,13 @@ function App() {
       {error && <div className="error-box">{error}</div>}
       <div className="searchbox"><Search size={18}/><input autoFocus placeholder="Имя, роль или ID сотрудника" value={query} onChange={e => setQuery(e.target.value)}/><kbd>⌘ K</kbd></div>
       <div className="account-list">{filtered.slice(0, 8).map(a => <button className="account-row" key={a.employee_id} onClick={() => login(a.employee_id)}><span className="avatar">{a.full_name.split(' ').map(s => s[0]).slice(0,2).join('')}</span><span className="account-info"><b>{a.full_name}</b><small>{a.role} <i>·</i> {a.grade} <i>·</i> {a.department}</small></span><span className="account-id">{a.employee_id}</span><ArrowRight size={17}/></button>)}{filtered.length === 0 && <div className="no-results">Сотрудник не найден</div>}</div>
+      <button className="hr-login-button" onClick={() => login(null, false, 'hr')}><UsersRound size={17}/> Войти как HR — развитие компании <ArrowRight size={17}/></button>
       <div className="login-footer"><span><ShieldCheck size={15}/> Только синтетические данные</span><button onClick={() => login(null, true)}><UserRound size={15}/> Войти как оператор</button></div>
     </section><div className="login-note">ОФИЦИАЛЬНЫЙ СРЕЗ ДАННЫХ <b>·</b> 01 ОКТЯБРЯ 2026</div>
   </main>;
+
+  if (path.startsWith('/hr') && actor.actor_role !== 'hr') return <main className="operator-page"><section className="operator-card"><h1>Сводка доступна только HR</h1><p>Текущая учётная запись не имеет доступа к развитию компании.</p><button className="primary-button" onClick={() => navigate('/')}>Вернуться в своё пространство</button><button className="link-button" onClick={logout}>Сменить учётную запись</button></section></main>;
+  if (actor.actor_role === 'hr') return <HrDashboard api={api} onLogout={logout}/>;
 
   if (actor.actor_role === 'operator') return <main className="operator-page"><header className="topbar"><a className="brand" href="#"><span className="brand-icon">cq</span><span>career<span className="brand-light">quest</span></span></a><span className="operator-label"><ShieldCheck size={15}/> Оператор</span><button className="plain-button" onClick={logout}>Выйти <LogOut size={16}/></button></header><section className="operator-card"><div className="eyebrow">ДЕМО-КОНТУР</div><h1>Настройки демонстрации</h1><p>Время сценария хранится на сервере отдельно от официального набора. Изменение не затрагивает системные часы и исходные данные.</p><label className="clock-label">ДАТА ДЕМО-СРЕЗА<input type="date" value={clock} onChange={e => setClock(e.target.value)}/></label><div className="operator-actions"><button className="primary-button" onClick={() => saveClock(clock)}>Сохранить дату</button><button className="secondary-button" onClick={() => saveClock('2026-10-01')}>Вернуть 1 октября</button>{clockSaved && <span className="saved">Сохранено</span>}</div><div className="dataset-note"><CalendarDays size={17}/> Дата официального набора: <b>2026-10-01</b></div><button className="link-button" onClick={logout}><ArrowLeft size={16}/> К выбору аккаунта</button></section></main>;
 

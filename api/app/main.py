@@ -59,6 +59,7 @@ def current_session(cq_session: str | None = Cookie(default=None), db: Session =
 class DemoLogin(BaseModel):
     employee_id: str | None = None
     operator: bool = False
+    actor_role: Literal['hr'] | None = None
 
 class ClockUpdate(BaseModel):
     as_of_date: date
@@ -76,7 +77,11 @@ def demo_accounts(db: Session = Depends(get_db)):
 
 @app.post("/api/demo/login")
 def demo_login(payload: DemoLogin, response: Response, db: Session = Depends(get_db)):
-    if payload.operator:
+    if payload.actor_role and (payload.operator or payload.employee_id):
+        raise HTTPException(422, 'Выберите одну демонстрационную учётную запись')
+    if payload.actor_role == 'hr':
+        actor_role, employee_id = 'hr', None
+    elif payload.operator:
         actor_role, employee_id = "operator", None
     elif payload.employee_id and db.get(Employee, payload.employee_id):
         has_reports = db.query(Employee.employee_id).filter(Employee.manager_id == payload.employee_id).first() is not None
@@ -100,17 +105,17 @@ def logout(response: Response, session: DemoSession = Depends(current_session), 
 @app.get("/api/session")
 def read_session(session: DemoSession = Depends(current_session), db: Session = Depends(get_db)):
     actor = db.get(Employee, session.employee_id) if session.employee_id else None
-    return {"actor_role": session.actor_role, "employee_id": session.employee_id, "actor_name": actor.full_name if actor else "Демо-оператор"}
+    return {"actor_role": session.actor_role, "employee_id": session.employee_id, "actor_name": actor.full_name if actor else ("HR" if session.actor_role == "hr" else "Демо-оператор")}
 
 @app.get("/api/me/profile")
 def my_profile(session: DemoSession = Depends(current_session), db: Session = Depends(get_db)):
-    if session.actor_role == "operator":
+    if session.actor_role not in ("employee", "manager"):
         raise HTTPException(status_code=403, detail="Choose an employee account to open a profile")
     return ProfileService(SqlProfileRepository(db)).get_profile(session.employee_id)
 
 @app.get("/api/employees/{employee_id}")
 def employee_profile(employee_id: str, session: DemoSession = Depends(current_session), db: Session = Depends(get_db)):
-    if session.actor_role != "operator" and session.employee_id != employee_id:
+    if session.actor_role != "operator" and (session.actor_role not in ("employee", "manager") or session.employee_id != employee_id):
         raise HTTPException(status_code=403, detail="A demo account can only open its own profile")
     return ProfileService(SqlProfileRepository(db)).get_profile(employee_id)
 
@@ -146,7 +151,7 @@ def activity_conflict_handler(request, exc):
     return JSONResponse(status_code=409, content={'detail': str(exc)})
 
 def activity_employee(session: DemoSession = Depends(current_session)):
-    if not session.employee_id or session.actor_role == 'operator':
+    if not session.employee_id or session.actor_role not in ('employee', 'manager'):
         raise HTTPException(403, 'Выберите учётную запись сотрудника')
     return session.employee_id
 
@@ -176,3 +181,15 @@ def recommendations(employee_id: str = Depends(activity_employee), db: Session =
     import asyncio
     from app.application.recommendations import RecommendationService
     return asyncio.run(RecommendationService(SqlActivityRepository(db), OpenAIRecommendationModel()).recommend(employee_id))
+
+
+@app.get('/api/hr/summary')
+def hr_summary(department: str | None = None, session: DemoSession = Depends(current_session), db: Session = Depends(get_db)):
+    if session.actor_role != 'hr':
+        raise HTTPException(403, 'Доступно только учётной записи HR')
+    from app.application.hr import HrService, UnknownDepartment
+    from app.infrastructure.sql_hr import SqlHrRepository
+    try:
+        return HrService(SqlHrRepository(db)).summary(department)
+    except UnknownDepartment as exc:
+        raise HTTPException(404, str(exc)) from exc

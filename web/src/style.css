@@ -13,3 +13,58 @@
 .recommendation-list { display: grid; gap: 16px; }
 .recommendation-list .activity-detail { margin: 0; }
 .recommendation-list li { margin-bottom: 6px; }
+
+.hr-login-button { display:flex; align-items:center; gap:9px; width:100%; margin-top:18px; padding:13px 10px; border:1px solid #d3decf; border-radius:8px; background:#f4f7f0; color:#345430; font-size:12px; text-align:left; }
+.hr-login-button svg:last-child { margin-left:auto; }
+.hr-page { color:#283c30; font-size:14px; line-height:1.6; }
+.hr-topbar .hr-role { margin-left:auto; margin-right:24px; display:flex; align-items:center; gap:8px; }
+.hr-content { max-width:1120px; padding:44px 32px 24px; margin:auto; }
+.hr-heading { display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.hr-heading h1 { font:600 32px/1.2 Manrope,sans-serif; letter-spacing:-.025em; margin:0 0 10px; }
+.hr-heading p, .hr-section>p { color:#566452; max-width:72ch; margin:0 0 16px; }
+.hr-page .secondary-button { display:inline-flex; gap:8px; align-items:center; min-height:44px; font-size:13px; color:#354f30; }
+.hr-page button:disabled { opacity:.6; cursor:wait; }
+.hr-page a { color:#365d35; text-underline-offset:4px; }
+.hr-page :focus-visible, .hr-login-button:focus-visible { outline:2px solid #365d35; outline-offset:4px; }
+.hr-page ::selection { background:#d7e6cc; color:#243922; }
+.hr-toolbar { display:flex; align-items:end; justify-content:space-between; gap:24px; margin:28px 0 20px; padding-bottom:24px; border-bottom:1px solid #dce3d7; }
+.hr-toolbar label { display:flex; flex-direction:column; gap:7px; font-weight:600; }
+.hr-toolbar select { min-height:44px; min-width:240px; max-width:100%; border:1px solid #aab9a2; border-radius:8px; background:white; color:#283c30; padding:8px 12px; font:inherit; }
+.hr-toolbar p { margin:0; font-variant-numeric:tabular-nums; }
+.hr-toolbar small { display:block; color:#566452; }
+.hr-sections { display:flex; gap:24px; flex-wrap:wrap; }
+.hr-privacy { display:flex; align-items:start; gap:10px; margin:24px 0; color:#50634b; }
+.hr-privacy svg { flex-shrink:0; margin-top:3px; }
+.hr-section { margin-top:44px; scroll-margin-top:24px; }
+.hr-section h2 { font:600 22px/1.35 Manrope,sans-serif; letter-spacing:-.02em; margin:0 0 12px; }
+.hr-section-heading { display:flex; justify-content:space-between; align-items:baseline; gap:16px; }
+.hr-section-heading>span { font-variant-numeric:tabular-nums; font-size:20px; }
+.hr-table-wrap { overflow-x:auto; border:1px solid #dce3d7; border-radius:12px; background:white; scrollbar-color:#a8b99e #f4f7ef; }
+.hr-table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.hr-table th, .hr-table td { text-align:left; padding:13px 16px; border-bottom:1px solid #e7ece3; }
+.hr-table thead { background:#ecf1e7; font-size:12px; }
+.hr-table th[scope=row] { font-weight:500; }
+.hr-table th small { display:block; color:#5d6e56; font-size:11px; }
+.hr-table tbody tr:last-child>* { border-bottom:0; }
+.hr-table td { white-space:nowrap; }
+.hr-table td:last-child { min-width:140px; }
+.hr-table tbody tr:hover { background:#f8faf5; }
+.hr-gap-value { display:flex; align-items:center; gap:12px; min-width:160px; }
+.hr-gap-bar { display:block; height:5px; background:#6d8e5c; flex-shrink:0; max-width:calc(100% - 40px); border-radius:3px; }
+.hr-withheld { color:#695e43; font-size:12px; }
+.hr-section .hr-note { font-size:12px; margin:14px 0 0; color:#596750; }
+.hr-empty { padding:18px; border-radius:8px; background:#edf1e7; color:#3d5435; }
+.hr-footer { display:flex; justify-content:space-between; gap:16px; margin-top:44px; padding-top:20px; border-top:1px solid #dce3d7; font-size:12px; color:#5c6a55; }
+.hr-footer a { display:flex; align-items:center; gap:6px; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media(max-width:650px) {
+  .hr-content { padding:28px 17px 20px; }
+  .hr-heading { align-items:start; flex-direction:column; gap:8px; }
+  .hr-heading h1 { font-size:27px; }
+  .hr-toolbar { align-items:start; flex-direction:column; gap:16px; }
+  .hr-toolbar label, .hr-toolbar select { width:100%; min-width:0; }
+  .hr-sections { gap:10px 18px; }
+  .hr-table th, .hr-table td { padding:11px 12px; }
+  .hr-section { margin-top:32px; }
+  .hr-footer { align-items:start; flex-direction:column; }
+}

@@ -17,7 +17,8 @@ class ActivityService:
     def __init__(self, repository: ActivityRepository):
         self.repository = repository
 
-    def card(self, event, profile, catalog):
+    @staticmethod
+    def card(event, profile, catalog):
         validate_audience(event, profile)
         active = next((h for h in profile['history'] if h['event_id'] == event['event_id'] and h['status'] in ('planned', 'in_progress')), None)
         sessions = available_sessions(event, profile)

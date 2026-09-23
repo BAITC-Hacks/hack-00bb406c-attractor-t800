@@ -34,12 +34,15 @@ class ModelUnavailable(Exception):
 
 def build_candidates(repository, employee_id):
     profile = repository.profile(employee_id)
+    candidates, excluded = candidates_for_profile(profile, repository.events())
+    return profile, candidates, excluded
+
+
+def candidates_for_profile(profile, catalog):
     if not profile['trajectory']['target']['profile_available']:
-        return profile, [], {'Нет профиля требований для выбранного ориентира': 1}
+        return [], {'Нет профиля требований для выбранного ориентира': 1}
     if not any(s['gap'] for s in profile['trajectory']['skills']):
-        return profile, [], {'Все требования ориентира выполнены; можно выбрать или обсудить другую цель': 1}
-    catalog = repository.events()
-    service = ActivityService(repository)
+        return [], {'Все требования ориентира выполнены; можно выбрать или обсудить другую цель': 1}
     candidates, excluded = [], Counter()
     today = day(profile['as_of_date'])
     for event in catalog:
@@ -47,7 +50,7 @@ def build_candidates(repository, employee_id):
             excluded['Активность уже завершена'] += 1
             continue
         try:
-            card = service.card(event, profile, catalog)
+            card = ActivityService.card(event, profile, catalog)
             active = card['participation']
             if active and any(h['event_id'] == event['event_id'] and h['status'] == 'completed' and day(h['date']) == day(active['date']) for h in profile['history']):
                 excluded['Сессия существующего участия уже завершена'] += 1
@@ -96,7 +99,7 @@ def build_candidates(repository, employee_id):
         candidate['history_alternatives'] = alternatives if candidate['recent_missed'] == 0 else []
         if candidate['history_alternatives']:
             candidate['allowed_reasons'].append('history_alternative')
-    return profile, candidates, dict(excluded)
+    return candidates, dict(excluded)
 
 
 def model_context(profile, candidates):
