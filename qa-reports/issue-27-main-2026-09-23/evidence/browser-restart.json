@@ -1,0 +1,5 @@
+{
+  "action": "reload account selection after container restart",
+  "duration_ms": 141,
+  "note": "First browser reload after restart; not an AI request."
+}

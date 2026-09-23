@@ -1,0 +1,24 @@
+ Container cq-acceptance-27-web-1 Restarting
+ Container cq-acceptance-27-db-1 Restarting
+ Container cq-acceptance-27-api-1 Restarting
+ Container cq-acceptance-27-db-1 Started
+ Container cq-acceptance-27-web-1 Started
+ Container cq-acceptance-27-api-1 Started
+ Container cq-acceptance-27-db-1 Running
+ Container cq-acceptance-27-api-1 Running
+ Container cq-acceptance-27-web-1 Running
+ Container cq-acceptance-27-db-1 Waiting
+ Container cq-acceptance-27-db-1 Healthy
+ Container cq-acceptance-27-api-1 Waiting
+ Container cq-acceptance-27-api-1 Healthy
+ Container cq-acceptance-27-db-1 Waiting
+ Container cq-acceptance-27-api-1 Waiting
+ Container cq-acceptance-27-web-1 Waiting
+ Container cq-acceptance-27-db-1 Healthy
+ Container cq-acceptance-27-web-1 Healthy
+ Container cq-acceptance-27-api-1 Healthy
+{"status":"ok","dataset_version":"1.0","as_of_date":"2026-10-15"}INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+0002_optional_activity_due_date (head)

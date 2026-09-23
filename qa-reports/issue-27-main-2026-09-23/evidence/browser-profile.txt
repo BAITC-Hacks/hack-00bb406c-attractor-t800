@@ -1,0 +1,133 @@
+Browser tab: 1, Title: "Career Quest", URL: "http://localhost:18087/".
+0 AXWebArea Career Quest, URL: localhost:18087/
+	1 container root
+		2 container
+			3 link Description: cq careerquest, Value: localhost:18087/#
+			4 text РАБОЧЕЕ ПРОСТРАНСТВО
+			5 button Мой рост
+				6 image
+				7 text Мой рост
+			8 button Моя команда, Help: Откроется в следующих разделах
+				9 image
+				10 text Моя команда
+			11 image
+			12 text Ваши данные
+			13 text защищены Career Quest · набор 1.0
+		14 container
+			15 container
+				16 text Мой рост  /  Обзор
+			17 image
+			18 text 15 окт. 2026 г.
+			19 button AA Aidos Akhmetov
+				20 text AA
+				21 text Aidos Akhmetov
+				22 image
+			23 text ВАШ ПРОФИЛЬ ·  E0043
+			24 heading Здравствуйте, Aidos, Value: 1
+				25 text Здравствуйте,  Aidos
+			26 text Здесь собран ваш карьерный путь и история развития.
+			27 text AA
+			28 text Frontend Engineer
+			29 container
+				30 text Senior  ·  Frontend Development
+			31 container
+				32 image
+				33 text КАРЬЕРНАЯ ТРАЕКТОРИЯ
+				34 heading Ваш путь в развитии., Value: 2
+					35 text Ваш путь
+					36 text в
+					37 text развитии.
+				38 text Карьерная цель пока не выбрана. Профиль и фактическая история уже здесь — следующий шаг можно определить позже.
+				39 link Description: Посмотреть навыки, Value: localhost:18087/#skills
+			40 container
+				41 image
+				42 text ВАШ МАРШРУТ ОДИН ШАГ ЗА РАЗ
+			43 container
+				44 image
+				45 text ЗАВЕРШЕНО АКТИВНОСТЕЙ 18  /  18 из истории набора
+			46 container
+				47 image
+				48 text ТЕКУЩИЙ УРОВЕНЬ Senior Frontend Engineer
+			49 container
+				50 image
+				51 text КАРЬЕРНАЯ ЦЕЛЬ Пока не выбрана Можно определить позже
+			52 container skills
+				53 text БАЗА ДЛЯ СЛЕДУЮЩЕГО ШАГА
+				54 heading Навыки вашей роли, Value: 2
+					55 text Навыки вашей роли
+				56 text Оценка на  2 июня 2026 г.
+			57 text API Design
+			58 container
+				59 text 1  / 5
+			60 container
+				61 text Цель  2
+			62 text Adaptability
+			63 container
+				64 text 2  / 5
+			65 container
+				66 text Цель  —
+			67 text CI/CD
+			68 container
+				69 text 3  / 5
+			70 container
+				71 text Цель  2
+			72 text Communication
+			73 container
+				74 text 3  / 5
+			75 container
+				76 text Цель  3
+			77 text Conflict Resolution
+			78 container
+				79 text 1  / 5
+			80 container
+				81 text Цель  —
+			82 text Critical Thinking
+			83 container
+				84 text 1  / 5
+			85 container
+				86 text Цель  —
+			87 text Emotional Intelligence
+			88 container
+				89 text 3  / 5
+			90 container
+				91 text Цель  —
+			92 text Feedback
+			93 container
+				94 text 1  / 5
+			95 container
+				96 text Цель  —
+			97 text Показаны 8 навыков из профиля этой роли. Расчётные уровни обновятся в следующих шагах продукта.
+			98 text ВАШИ ДАННЫЕ ИЗ НАБОРА
+			99 heading История активностей, Value: 2
+				100 text История активностей
+			101 text 18  записей
+			102 container
+				103 image
+				104 text Web Performance Deep Dive EV_014 · Добровольная Завершено 3 сент. 2026 г.
+			105 container
+				106 image
+				107 text Time & Priority Management EV_039 · Добровольная Завершено 7 июл. 2026 г.
+			108 container
+				109 image
+				110 text Secure Coding Workshop EV_011 · Добровольная Завершено 23 июн. 2026 г.
+			111 container
+				112 image
+				113 text Code of Conduct & Workplace Safety EV_003 · Обязательная Завершено 1 июн. 2026 г.
+			114 container
+				115 image
+				116 text Personal Data Protection EV_002 · Обязательная Завершено 2 мар. 2026 г.
+			117 container
+				118 image
+				119 text System Design Fundamentals EV_005 · Добровольная Завершено 2 мар. 2026 г.
+			120 container
+				121 image
+				122 text Structured Problem Solving EV_040 · Добровольная Завершено 16 февр. 2026 г.
+			123 container
+				124 image
+				125 text Web Performance Fundamentals EV_015 · Добровольная Завершено 12 нояб. 2025 г.
+			126 container
+				127 text Показаны последние 8 записей из  18
+			128 text Демонстрационное приложение · данные синтетические
+			129 link Description: В начало, Value: localhost:18087/#top
+
+The focused UI element is 0 AXWebArea Career Quest, URL: localhost:18087/

@@ -1,0 +1,8 @@
+      entity      | count
+------------------+-------
+ employees        |   200
+ events           |    40
+ skills           |    60
+ role_profiles    |    32
+ activity_history |  2743
+(5 rows)

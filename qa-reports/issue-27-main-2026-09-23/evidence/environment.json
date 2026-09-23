@@ -1,0 +1,8 @@
+{
+  "revision": "3c98153199486dba5b4cde2f1dba9c04b05a13a5",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "docker": "29.3.1",
+  "compose": "5.1.1",
+  "python": "3.14.4"
+}

@@ -1,0 +1,246 @@
+{
+  "method": "Host wall clock around UI click and visible destination heading; includes automation overhead. Initial manual login/logout was warm-up.",
+  "environment": "Codex in-app browser; original dataset; controlled date 2026-10-15",
+  "samples": [
+    {
+      "iteration": 1,
+      "action": "open E0043 profile",
+      "duration_ms": 280,
+      "status": "пройден"
+    },
+    {
+      "iteration": 1,
+      "action": "return to account selection",
+      "duration_ms": 272,
+      "status": "пройден"
+    },
+    {
+      "iteration": 2,
+      "action": "open E0043 profile",
+      "duration_ms": 267,
+      "status": "пройден"
+    },
+    {
+      "iteration": 2,
+      "action": "return to account selection",
+      "duration_ms": 265,
+      "status": "пройден"
+    },
+    {
+      "iteration": 3,
+      "action": "open E0043 profile",
+      "duration_ms": 265,
+      "status": "пройден"
+    },
+    {
+      "iteration": 3,
+      "action": "return to account selection",
+      "duration_ms": 267,
+      "status": "пройден"
+    },
+    {
+      "iteration": 4,
+      "action": "open E0043 profile",
+      "duration_ms": 268,
+      "status": "пройден"
+    },
+    {
+      "iteration": 4,
+      "action": "return to account selection",
+      "duration_ms": 267,
+      "status": "пройден"
+    },
+    {
+      "iteration": 5,
+      "action": "open E0043 profile",
+      "duration_ms": 277,
+      "status": "пройден"
+    },
+    {
+      "iteration": 5,
+      "action": "return to account selection",
+      "duration_ms": 271,
+      "status": "пройден"
+    },
+    {
+      "iteration": 6,
+      "action": "open E0043 profile",
+      "duration_ms": 268,
+      "status": "пройден"
+    },
+    {
+      "iteration": 6,
+      "action": "return to account selection",
+      "duration_ms": 265,
+      "status": "пройден"
+    },
+    {
+      "iteration": 7,
+      "action": "open E0043 profile",
+      "duration_ms": 270,
+      "status": "пройден"
+    },
+    {
+      "iteration": 7,
+      "action": "return to account selection",
+      "duration_ms": 264,
+      "status": "пройден"
+    },
+    {
+      "iteration": 8,
+      "action": "open E0043 profile",
+      "duration_ms": 267,
+      "status": "пройден"
+    },
+    {
+      "iteration": 8,
+      "action": "return to account selection",
+      "duration_ms": 266,
+      "status": "пройден"
+    },
+    {
+      "iteration": 9,
+      "action": "open E0043 profile",
+      "duration_ms": 269,
+      "status": "пройден"
+    },
+    {
+      "iteration": 9,
+      "action": "return to account selection",
+      "duration_ms": 264,
+      "status": "пройден"
+    },
+    {
+      "iteration": 10,
+      "action": "open E0043 profile",
+      "duration_ms": 269,
+      "status": "пройден"
+    },
+    {
+      "iteration": 10,
+      "action": "return to account selection",
+      "duration_ms": 264,
+      "status": "пройден"
+    },
+    {
+      "iteration": 11,
+      "action": "open E0043 profile",
+      "duration_ms": 268,
+      "status": "пройден"
+    },
+    {
+      "iteration": 11,
+      "action": "return to account selection",
+      "duration_ms": 270,
+      "status": "пройден"
+    },
+    {
+      "iteration": 12,
+      "action": "open E0043 profile",
+      "duration_ms": 264,
+      "status": "пройден"
+    },
+    {
+      "iteration": 12,
+      "action": "return to account selection",
+      "duration_ms": 265,
+      "status": "пройден"
+    },
+    {
+      "iteration": 13,
+      "action": "open E0043 profile",
+      "duration_ms": 267,
+      "status": "пройден"
+    },
+    {
+      "iteration": 13,
+      "action": "return to account selection",
+      "duration_ms": 268,
+      "status": "пройден"
+    },
+    {
+      "iteration": 14,
+      "action": "open E0043 profile",
+      "duration_ms": 266,
+      "status": "пройден"
+    },
+    {
+      "iteration": 14,
+      "action": "return to account selection",
+      "duration_ms": 267,
+      "status": "пройден"
+    },
+    {
+      "iteration": 15,
+      "action": "open E0043 profile",
+      "duration_ms": 266,
+      "status": "пройден"
+    },
+    {
+      "iteration": 15,
+      "action": "return to account selection",
+      "duration_ms": 267,
+      "status": "пройден"
+    },
+    {
+      "iteration": 16,
+      "action": "open E0043 profile",
+      "duration_ms": 263,
+      "status": "пройден"
+    },
+    {
+      "iteration": 16,
+      "action": "return to account selection",
+      "duration_ms": 258,
+      "status": "пройден"
+    },
+    {
+      "iteration": 17,
+      "action": "open E0043 profile",
+      "duration_ms": 259,
+      "status": "пройден"
+    },
+    {
+      "iteration": 17,
+      "action": "return to account selection",
+      "duration_ms": 257,
+      "status": "пройден"
+    },
+    {
+      "iteration": 18,
+      "action": "open E0043 profile",
+      "duration_ms": 258,
+      "status": "пройден"
+    },
+    {
+      "iteration": 18,
+      "action": "return to account selection",
+      "duration_ms": 259,
+      "status": "пройден"
+    },
+    {
+      "iteration": 19,
+      "action": "open E0043 profile",
+      "duration_ms": 257,
+      "status": "пройден"
+    },
+    {
+      "iteration": 19,
+      "action": "return to account selection",
+      "duration_ms": 260,
+      "status": "пройден"
+    },
+    {
+      "iteration": 20,
+      "action": "open E0043 profile",
+      "duration_ms": 258,
+      "status": "пройден"
+    },
+    {
+      "iteration": 20,
+      "action": "return to account selection",
+      "duration_ms": 258,
+      "status": "пройден"
+    }
+  ]
+}

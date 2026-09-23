@@ -1,0 +1,9 @@
+{
+  "browser": "Codex in-app browser (iab)",
+  "version": "not exposed by browser tool",
+  "viewport": {
+    "height": 720,
+    "width": 1280
+  },
+  "origin": "http://localhost:18087"
+}
