@@ -1,0 +1,13 @@
+
+> career-quest-web@0.1.0 build
+> vite build
+
+vite v6.3.5 building for production...
+transforming...
+✓ 1578 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.42 kB │ gzip:  0.31 kB
+dist/assets/index-Bt-EqXev.css   11.75 kB │ gzip:  3.38 kB
+dist/assets/index-wfA_kwit.js   209.85 kB │ gzip: 65.69 kB
+✓ built in 737ms

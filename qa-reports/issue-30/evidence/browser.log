@@ -1,0 +1,7 @@
+PASS: search, login, Halyk entry, goal, all skills/history, navigation, reload and account isolation
+PASS: mobile 390×844 and desktop layout, tree assets, bottom navigation and keyboard focus
+PASS: API failure, retry, failed logout and expired-session isolation
+PASS: expiry between session and profile during restoration
+PASS: loading, missing goal and empty skills/history states
+PASS: operator date save, session reload, employee date, failed-save feedback and reset
+PASS: complete browser acceptance suite
