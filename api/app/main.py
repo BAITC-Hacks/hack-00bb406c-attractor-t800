@@ -218,3 +218,6 @@ def approve_work_plan(employee_id: str, payload: work_goals.Approval,
                       period: str = Path(pattern=r'^20\d{2}-Q[1-4]$'),
                       session: DemoSession = Depends(current_session), db: Session = Depends(get_db)):
     return work_goals.approve(db, session, employee_id, period, payload)
+
+from app.import_routes import router as import_router
+app.include_router(import_router(get_db, current_session))
