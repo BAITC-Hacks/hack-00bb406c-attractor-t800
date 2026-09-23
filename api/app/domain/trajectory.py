@@ -23,6 +23,10 @@ def day(value):
     return date.fromisoformat(str(value)[:10])
 
 
+def apply_gain(current, gain, max_level):
+    return max(current, min(5, current + gain, max_level))
+
+
 def calculate_levels(assessed, review_date, history, as_of_date):
     levels = dict(assessed)
     sources, seen_records, seen_events = [], set(), set()
@@ -50,7 +54,7 @@ def calculate_levels(assessed, review_date, history, as_of_date):
                 for rule in row["develops_skills"]:
                     skill = rule["skill_id"]
                     before = levels.get(skill, 0)
-                    after = max(before, min(5, before + rule["gain"], rule["max_level"]))
+                    after = apply_gain(before, rule["gain"], rule["max_level"])
                     levels[skill] = after
                     source["changes"].append({"skill_id": skill, "before": before, "after": after, "gain": rule["gain"], "max_level": rule["max_level"]})
                 if not row["develops_skills"]:

@@ -13,7 +13,7 @@ class ActivityApiTests(unittest.TestCase):
         self.db = Session(self.connection, join_transaction_mode='create_savepoint')
         app.dependency_overrides[get_db] = lambda: self.db
         self.client = TestClient(app)
-        self.client.post('/api/demo/login', json={'employee_id': 'E0174'})
+        self.clock('2026-10-01')
 
     def tearDown(self):
         self.client.close()
@@ -81,3 +81,20 @@ class ActivityApiTests(unittest.TestCase):
         self.assertEqual(self.client.post(f'/api/me/participations/{record}/complete').status_code, 200)
         self.assertEqual(self.client.post('/api/me/activities/EV_036/enroll', json={'session_date': '2026-10-08'}).status_code, 409)
         self.assertEqual(self.client.post('/api/me/activities/EV_036/enroll', json={'session_date': '2026-10-22'}).status_code, 200)
+
+    def test_forecast_explains_newly_unlocked_catalog_step(self):
+        # A synthetic catalog prerequisite fixture; assertions remain at the HTTP seam.
+        from app.models import Event
+        self.db.get(Event, 'EV_033').prerequisites = {'SK_NEGOTIATION': 3}
+        self.db.flush()
+        preview = self.client.get('/api/me/activities/EV_032').json()
+        self.assertEqual([event['event_id'] for event in preview['newly_available']], ['EV_033'])
+        self.assertEqual(self.client.get('/api/me/activities/EV_033').status_code, 409)
+
+    def test_existing_imported_participation_can_be_completed(self):
+        from datetime import date
+        from app.models import ActivityHistory
+        self.db.add(ActivityHistory(record_id='TEST_IMPORT_PROGRESS', employee_id='E0174', event_id='EV_032', date=date(2026, 9, 25), status='in_progress', completion_pct=50, assigned_by='self'))
+        self.db.flush()
+        response = self.client.post('/api/me/participations/TEST_IMPORT_PROGRESS/complete')
+        self.assertEqual(response.status_code, 200, response.text)

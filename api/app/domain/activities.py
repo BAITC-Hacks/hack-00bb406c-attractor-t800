@@ -1,6 +1,6 @@
 """Availability and hypothetical learning changes, independent of persistence."""
 from copy import deepcopy
-from app.domain.trajectory import REPEATABLE_EVENTS, day
+from app.domain.trajectory import REPEATABLE_EVENTS, apply_gain, day
 
 
 class ActivityConflict(ValueError):
@@ -37,7 +37,7 @@ def forecast(event, trajectory):
             skill = dict(skill_id=rule['skill_id'], name=rule['skill_id'], assessed_level=0, calculated_level=0, required_level=None, critical=False, gap=0)
             result['skills'].append(skill)
         before = skill['calculated_level']
-        skill['calculated_level'] = max(before, min(5, before + rule['gain'], rule['max_level']))
+        skill['calculated_level'] = apply_gain(before, rule['gain'], rule['max_level'])
         skill['gap'] = max(0, (skill['required_level'] or 0) - skill['calculated_level'])
     result['critical_gaps'] = [s['skill_id'] for s in result['skills'] if s['critical'] and s['gap']]
     result['requirements_met'] = all(s['gap'] == 0 for s in result['skills']) if result['target']['profile_available'] else None
