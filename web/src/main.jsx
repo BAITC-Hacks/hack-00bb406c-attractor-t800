@@ -4,16 +4,25 @@ import {
   ArrowRight,
   BookOpen,
   CalendarDays,
+  CalendarClock,
   Check,
+  CircleCheck,
   CreditCard,
   Home,
   LogOut,
+  Mic,
+  MicOff,
+  Pause,
+  Play,
   Search,
   ShieldCheck,
   Sprout,
   Target,
+  Timer,
   TreeDeciduous,
   UserRound,
+  Users,
+  VideoOff,
   Wallet,
 } from "lucide-react";
 import "./style.css";
@@ -63,11 +72,229 @@ const statusLabels = {
 };
 const tabs = [
   ["growth", TreeDeciduous, "Дерево"],
+  ["meetings", Users, "Встречи"],
   ["tests", BookOpen, "Тесты"],
   ["goals", Target, "Цели"],
   ["profile", UserRound, "Профиль"],
   ["bank", Home, "Halyk"],
 ];
+
+const meetingStatusLabels = {
+  scheduled: "Запланирована",
+  ready: "Готова к демо",
+  active: "Идёт симуляция",
+  paused: "На паузе",
+  ended: "Завершена",
+};
+const formatMeetingDate = (value) =>
+  new Date(value).toLocaleString("ru-RU", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+const formatDuration = (seconds) =>
+  `${Math.floor(seconds / 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
+const localDateTime = () => {
+  const value = new Date(Date.now() + 60 * 60 * 1000);
+  value.setMinutes(value.getMinutes() - value.getTimezoneOffset());
+  return value.toISOString().slice(0, 16);
+};
+
+function OneToOne({ onAuthError }) {
+  const [context, setContext] = useState(null);
+  const [meetings, setMeetings] = useState([]);
+  const [selectedId, setSelectedId] = useState("");
+  const [topic, setTopic] = useState("");
+  const [scheduledAt, setScheduledAt] = useState(localDateTime);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const commandKeys = useRef(new Map());
+  const createRequest = useRef(null);
+  const selected = meetings.find((meeting) => meeting.meeting_id === selectedId);
+
+  function keyFor(meetingId, action) {
+    const key = `${meetingId}:${action}`;
+    if (!commandKeys.current.has(key))
+      commandKeys.current.set(key, crypto.randomUUID());
+    return commandKeys.current.get(key);
+  }
+  async function load() {
+    setLoading(true);
+    setError("");
+    try {
+      const [nextContext, nextMeetings] = await Promise.all([
+        api("/api/one-to-ones/context"),
+        api("/api/one-to-ones"),
+      ]);
+      setContext(nextContext);
+      setMeetings(nextMeetings);
+      setSelectedId((current) =>
+        nextMeetings.some((meeting) => meeting.meeting_id === current)
+          ? current
+          : nextMeetings[0]?.meeting_id || "",
+      );
+    } catch (e) {
+      if (e.status === 401) onAuthError(e);
+      else {
+        if (e.status === 409) createRequest.current = null;
+        setError(e.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    load();
+  }, []);
+  async function command(action) {
+    if (!selected) return;
+    setSaving(true);
+    setError("");
+    try {
+      const result = await api(
+        `/api/one-to-ones/${selected.meeting_id}/commands`,
+        {
+          method: "POST",
+          body: JSON.stringify({ action, idempotency_key: keyFor(selected.meeting_id, action) }),
+        },
+      );
+      commandKeys.current.delete(`${selected.meeting_id}:${action}`);
+      setMeetings((current) =>
+        current.map((meeting) =>
+          meeting.meeting_id === result.meeting_id ? result : meeting,
+        ),
+      );
+      const refreshedContext = await api("/api/one-to-ones/context");
+      setContext(refreshedContext);
+    } catch (e) {
+      if (e.status === 401) onAuthError(e);
+      else setError(e.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+  useEffect(() => {
+    if (!selected || selected.status !== "active") return undefined;
+    const interval = window.setInterval(() => {
+      command("heartbeat");
+    }, context?.heartbeat_interval_seconds * 1000 || 10000);
+    return () => window.clearInterval(interval);
+  }, [selected?.meeting_id, selected?.status, context?.heartbeat_interval_seconds]);
+  async function createMeeting(event) {
+    event.preventDefault();
+    setSaving(true);
+    setError("");
+    if (!createRequest.current) {
+      createRequest.current = {
+        topic,
+        scheduled_at: new Date(scheduledAt).toISOString(),
+        idempotency_key: crypto.randomUUID(),
+      };
+    }
+    try {
+      const created = await api("/api/one-to-ones", {
+        method: "POST",
+        body: JSON.stringify(createRequest.current),
+      });
+      createRequest.current = null;
+      setMeetings((current) => [created, ...current]);
+      setSelectedId(created.meeting_id);
+      setTopic("");
+    } catch (e) {
+      if (e.status === 401) onAuthError(e);
+      else setError(e.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+  if (loading && !context)
+    return <section className="empty card" role="status">Загружаем встречи…</section>;
+  return (
+    <div className="one-to-one-page">
+      <section className="simulation-banner">
+        <VideoOff size={21} />
+        <div>
+          <strong>Демо-симуляция, без видеосвязи</strong>
+          <p>Камера, микрофон и присутствие ниже — условные. Разговор не записывается и факт реальной встречи не подтверждается.</p>
+        </div>
+      </section>
+      {error && (
+        <div className="error-box" role="alert">
+          <p>{error}</p>
+          <button className="secondary-btn" onClick={load} disabled={loading}>Обновить данные</button>
+        </div>
+      )}
+      {context?.manager ? (
+        <>
+          <section className="meeting-context card">
+            <div>
+              <p className="muted">Ваш руководитель из базы</p>
+              <h1>{context.manager.full_name}</h1>
+              <p>{context.manager.employee_id}</p>
+            </div>
+            <div className="demo-xp"><Sprout size={20} /><strong>{context.demo_xp} демо-XP</strong></div>
+          </section>
+          <section className="meeting-schedule card">
+            <h2><CalendarClock size={20} /> Запланировать встречу</h2>
+            <form onSubmit={createMeeting}>
+              <label>
+                Тема встречи
+                <input required maxLength={240} value={topic} onChange={(event) => setTopic(event.target.value)} placeholder="Например, план развития на квартал" />
+              </label>
+              <label>
+                Дата и время
+                <input required type="datetime-local" value={scheduledAt} onChange={(event) => setScheduledAt(event.target.value)} />
+              </label>
+              <button className="primary-btn" disabled={saving || !topic.trim()}>Сохранить встречу</button>
+            </form>
+          </section>
+          <section className="meeting-section">
+            <div className="section-heading meeting-list-heading">
+              <h2>Встречи и история</h2>
+              <button className="secondary-btn" onClick={load} disabled={loading}>Обновить</button>
+            </div>
+            {!meetings.length ? (
+              <p className="empty card">Пока нет встреч. Запланируйте первую — она сохранится в вашей истории.</p>
+            ) : (
+              <div className="meeting-layout">
+                <div className="meeting-list" aria-label="Список встреч">
+                  {meetings.map((meeting) => (
+                    <button key={meeting.meeting_id} className={`meeting-list-item ${selectedId === meeting.meeting_id ? "selected" : ""}`} onClick={() => setSelectedId(meeting.meeting_id)}>
+                      <strong>{meeting.topic}</strong>
+                      <span>{formatMeetingDate(meeting.scheduled_at)}</span>
+                      <small>{meetingStatusLabels[meeting.status]} · {formatDuration(meeting.qualifying_seconds)}</small>
+                    </button>
+                  ))}
+                </div>
+                {selected && (
+                  <article className="meeting-detail card">
+                    <div className="meeting-detail-heading">
+                      <div><span className={`status ${selected.qualified ? "completed" : ""}`}>{meetingStatusLabels[selected.status]}</span><h2>{selected.topic}</h2><p>{formatMeetingDate(selected.scheduled_at)} · {selected.manager.full_name}</p></div>
+                      <div className="timer"><Timer size={19} /><strong>{formatDuration(selected.qualifying_seconds)}</strong><small>учитываемое время</small></div>
+                    </div>
+                    <div className="discussion-prompts">
+                      <strong>Подготовка к разговору</strong>
+                      <ul><li>Какой навык вы хотите развить?</li><li>Что поможет сделать следующий шаг?</li><li>Какая поддержка нужна от руководителя?</li></ul>
+                    </div>
+                    {selected.status === "scheduled" && <button className="primary-btn" disabled={saving} onClick={() => command("confirm_demo")}><CircleCheck size={17} /> Подтвердить уведомление для демо</button>}
+                    {selected.status === "ready" && <div className="meeting-actions"><button className="primary-btn" disabled={saving} onClick={() => command("start")}><Play size={17} /> Начать симуляцию</button><button className="secondary-btn" disabled={saving} onClick={() => command("toggle_manager")}><Users size={17} />{selected.manager_present ? "Убрать тимлида" : "Вернуть тимлида"}</button><button className="secondary-btn" disabled={saving} onClick={() => command("toggle_microphone")}>{selected.simulated_microphone_on ? <MicOff size={17} /> : <Mic size={17} />}{selected.simulated_microphone_on ? "Выключить микрофон" : "Включить микрофон"}</button><button className="secondary-btn" disabled={saving} onClick={() => command("finish")}>Завершить без запуска</button></div>}
+                    {(selected.status === "active" || selected.status === "paused") && <div className="meeting-actions"><button className="primary-btn" disabled={saving} onClick={() => command(selected.status === "active" ? "pause" : "resume")}>{selected.status === "active" ? <Pause size={17} /> : <Play size={17} />}{selected.status === "active" ? "Пауза" : "Продолжить"}</button><button className="secondary-btn" disabled={saving} onClick={() => command("toggle_manager")}><Users size={17} />{selected.manager_present ? "Тимлид присутствует" : "Тимлид отсутствует"}</button><button className="secondary-btn" disabled={saving} onClick={() => command("toggle_microphone")}>{selected.simulated_microphone_on ? <Mic size={17} /> : <MicOff size={17} />}{selected.simulated_microphone_on ? "Микрофон включён" : "Микрофон выключен"}</button>{selected.status === "active" && <><button className="secondary-btn" disabled={saving} onClick={() => command("fast_forward_minute")}>+1 минута</button><button className="secondary-btn" disabled={saving} onClick={() => command("fast_forward_last_second")}>До 14:59</button><button className="secondary-btn" disabled={saving} onClick={() => command("fast_forward_threshold")}>До порога 15:00</button></>}<button className="secondary-btn" disabled={saving} onClick={() => command("finish")}>Завершить</button></div>}
+                    {selected.status === "ended" && <p className={selected.qualified ? "saved" : "notice"}>{selected.qualified ? <><Check size={16} /> Встреча зачтена. По 100 демо-XP начислено каждому участнику.</> : "Встреча завершена до порога 15 минут учитываемого времени. Награда не начислена."}</p>}
+                    {selected.status !== "ended" && <p className="notice">Учёт идёт только пока встреча активна, тимлид присутствует и условный микрофон включён. Требуется 15 минут. Симуляция не меняет навыки или карьерную цель.</p>}
+                    {selected.accelerated && <p className="simulation-mark">Время ускорено командой демо.</p>}
+                    {selected.qualified && selected.status !== "ended" && <p className="saved"><Check size={16} /> Порог достигнут · по 100 демо-XP обоим участникам.</p>}
+                  </article>
+                )}
+              </div>
+            )}
+          </section>
+        </>
+      ) : (
+        <section className="empty card manager-unavailable"><Users size={34} /><h1>Встреча пока недоступна</h1><p>В официальной базе для {context?.employee?.full_name || "этого сотрудника"} не указан руководитель. Обратитесь к администратору набора данных.</p></section>
+      )}
+    </div>
+  );
+}
 
 function Brand() {
   return (
@@ -223,6 +450,11 @@ function Growth({ profile, navigate }) {
           <BookOpen />
           <strong>Тесты навыков</strong>
           <span>Скоро · пока недоступны</span>
+        </button>
+        <button onClick={() => navigate("meetings")}>
+          <Users />
+          <strong>One-to-one с руководителем</strong>
+          <span>Запланировать и обсудить развитие <ArrowRight size={15} /></span>
         </button>
       </div>
     </>
@@ -661,6 +893,7 @@ function App() {
             {view === "growth" && (
               <Growth profile={profile} navigate={navigate} />
             )}
+            {view === "meetings" && <OneToOne onAuthError={handleError} />}
             {view === "profile" && <Profile profile={profile} />}
             {view === "tests" && (
               <section className="empty card">
@@ -683,9 +916,11 @@ function App() {
                 <Target size={32} />
                 <Goal employee={profile.employee} />
                 <p className="notice">
-                  Изменение цели, план развития и встречи пока недоступны. Эта
-                  страница показывает сохранённую цель.
+                  Эта страница показывает сохранённую цель. Запланировать one-to-one можно во вкладке «Встречи».
                 </p>
+                <button className="secondary-btn" onClick={() => navigate("meetings")}>
+                  <Users size={16} /> Открыть встречи
+                </button>
                 <button
                   className="secondary-btn"
                   onClick={() => navigate("profile")}

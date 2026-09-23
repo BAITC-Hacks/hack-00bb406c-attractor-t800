@@ -1,42 +1,16 @@
-import hashlib
-import hmac
 import secrets
 from datetime import date, datetime, timedelta, timezone
-from fastapi import Cookie, Depends, FastAPI, HTTPException, Response
+from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from app.config import SESSION_SECRET
-from app.db import SessionLocal
 from app.models import DemoClock, DemoSession, Employee
 from app.application.profiles import ProfileService
 from app.infrastructure.sql_profiles import SqlProfileRepository
+from app.session import COOKIE, current_session, get_db, token_digest
 
 app = FastAPI(title="Career Quest API", version="0.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:8080"], allow_credentials=True, allow_methods=["GET", "POST", "DELETE"], allow_headers=["Content-Type", "X-CSRF-Token"])
-COOKIE = "cq_session"
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-def token_digest(token: str) -> str:
-    return hmac.new(SESSION_SECRET.encode(), token.encode(), hashlib.sha256).hexdigest()
-
-def current_session(cq_session: str | None = Cookie(default=None), db: Session = Depends(get_db)):
-    if not cq_session:
-        raise HTTPException(status_code=401, detail="Sign in with a synthetic demo account")
-    session = db.get(DemoSession, token_digest(cq_session))
-    if not session or session.expires_at <= datetime.now(timezone.utc):
-        if session:
-            db.delete(session)
-            db.commit()
-        raise HTTPException(status_code=401, detail="Demo session expired")
-    return session
-
 class DemoLogin(BaseModel):
     employee_id: str | None = None
     operator: bool = False
@@ -119,3 +93,6 @@ def reset_clock(session: DemoSession = Depends(current_session), db: Session = D
     clock.as_of_date = date(2026, 10, 1)
     db.commit()
     return {"as_of_date": clock.as_of_date}
+
+from app.one_to_ones import router as one_to_ones_router
+app.include_router(one_to_ones_router)
