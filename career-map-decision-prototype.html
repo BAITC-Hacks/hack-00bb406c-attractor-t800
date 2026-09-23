@@ -18,16 +18,123 @@
     .step .ai p.muted{color:#c9dcd5}
     .webview .step .card,.webview .step .forecast{padding:11px}
   </style>
+
+  <style>
+    .path-view{background:#f2f7f5;color:#153b34}
+    .path-view .outer{max-width:none;padding:0 16px}
+    .path-view .switcher{position:relative;inset:auto;left:auto;bottom:auto;transform:none;margin:18px auto 26px;width:max-content;box-shadow:none}
+    .quest{--forest:#075f4c;--deep:#064a3c;--mint:#ebf8f4;--gold:#e6b64e;background:#fbfdfc;min-height:100vh;box-shadow:0 16px 45px #143c3020}
+    .quest.browser{max-width:1080px;margin:auto}
+    .quest.webview{max-width:390px;margin:16px auto;border-radius:26px;overflow:hidden}
+    .quest *{min-width:0}
+    .quest button{transition:background-color .18s ease,transform .18s ease}
+    .quest button:hover{transform:translateY(-1px)}
+    .quest button:active{transform:translateY(0)}
+    .quest-top{display:flex;align-items:center;justify-content:space-between;padding:18px 24px 7px;background:#fff}
+    .quest-brand{display:flex;align-items:center;gap:12px;font-size:19px;font-weight:800;letter-spacing:-.025em}
+    .quest-mark{width:39px;height:39px;border-radius:10px;background:var(--forest);color:#fff;display:grid;place-items:center;font-size:22px;font-weight:900}
+    .quest-avatar{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;background:#e0f3eb;color:#17473b;font-weight:800}
+    .quest-host{gap:8px}
+    .quest-host-control{border:0;background:none;color:#0b604c;padding:5px}
+    .quest-host-control svg{width:21px;height:21px}
+    .quest-host-control.back svg{transform:rotate(180deg)}
+    .quest-main{padding:24px 24px 112px}
+    .quest-welcome{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px}
+    .quest-welcome p{margin:0;color:#617a74;font-size:16px}
+    .quest-welcome h1{font-size:clamp(34px,4vw,46px);line-height:1.05;letter-spacing:-.035em;margin:3px 0 0;color:#123b34}
+    .quest-demo{background:#edf8f3;color:#346c5d;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:700}
+    .quest-goal{display:flex;align-items:center;gap:16px;padding:24px;background:linear-gradient(112deg,#075744,#08765d);color:#fff;border-radius:17px}
+    .quest-goal svg{color:#f1c860;flex:none}
+    .quest-goal div{flex:1}
+    .quest-goal small{display:block;letter-spacing:.13em;font-size:11px;font-weight:800;color:#d6efe6}
+    .quest-goal h2{font-size:27px;line-height:1.15;letter-spacing:-.025em;margin:6px 0 4px}
+    .quest-goal p{margin:0;color:#d8eee6}
+    .quest-goal button{color:white;background:transparent;border:1px solid #ffffff99;border-radius:10px;padding:10px 14px;font-weight:700}
+    .quest-goal-detail{background:#eaf7f1;border-radius:0 0 14px 14px;padding:14px 18px;margin:-5px 9px 14px;line-height:1.6}
+    .quest-goal-detail b{display:block;margin-bottom:5px}
+    .quest-progress{background:#fff;border:1px solid #e0eae5;border-radius:16px;padding:18px 20px;margin-top:15px}
+    .quest-progress-head{display:flex;align-items:center;gap:12px}
+    .quest-progress-head svg{color:#d4a635;flex:none}
+    .quest-progress-head div{flex:1}
+    .quest-progress-head span{color:#647970;font-size:13px}
+    .quest-progress-head strong{display:block;font-size:18px;line-height:1.2}
+    .quest-progress-head b{font-size:14px;color:#7d6119;text-align:right}
+    .quest-skillbars{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:17px 2px 1px}
+    .quest-skillbars label{display:flex;justify-content:space-between;gap:7px;font-size:12px;font-weight:700;color:#355a4e}
+    .quest-skillbars i{display:block;height:7px;margin-top:7px;background:#edf0eb;border-radius:99px;overflow:hidden}
+    .quest-skillbars i:before{content:'';display:block;height:100%;width:66.67%;background:#e8b84f;border-radius:99px}
+    .quest-skillbars .complete i:before{width:100%;background:#0b8063}
+    .quest-columns{display:grid;grid-template-columns:minmax(0,.83fr) minmax(0,1.17fr);gap:30px;margin-top:25px;align-items:start}
+    .quest-section-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 14px}
+    .quest-section-title h2{font-size:23px;letter-spacing:-.025em;margin:0}
+    .quest-section-title span{font-size:13px;color:#687d74}
+    .quest-route{padding:0 4px 0 12px}
+    .quest-stage{position:relative;display:flex;gap:17px;min-height:79px}
+    .quest-stage:not(:last-child):before{content:'';position:absolute;left:18px;top:38px;bottom:0;border-left:2px solid #17856b}
+    .quest-stage.waiting:before{border-left:2px dashed #c9d5d0}
+    .quest-node{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;background:#086b55;color:white;z-index:1}
+    .quest-stage.current .quest-node{background:#fff;border:3px solid #08745d;box-shadow:inset 0 0 0 6px #08745d}
+    .quest-stage.waiting .quest-node{background:#f0f4f2;color:#6a7b76;border:1px solid #d6e2dc}
+    .quest-stage-content{flex:1;padding:3px 0 20px}
+    .quest-stage-content strong{font-size:16px;display:block;line-height:1.15}
+    .quest-stage-content small{display:block;color:#6b8079;margin-top:4px}
+    .quest-stage-content p{margin:3px 0 0;color:#6b8079;font-size:13px}
+    .quest-stage button{align-self:flex-start;border:0;background:transparent;color:#235848;padding:4px;min-height:38px}
+    .quest-mission{background:#fff;border:1px solid #e0eae5;border-radius:18px;padding:19px}
+    .quest-mission-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .quest-tag{background:#e7f6ee;color:#246650;padding:6px 11px;border-radius:99px;font-size:12px;font-weight:700}
+    .quest-code{background:#fff2d3;color:#775713;padding:6px 9px;border-radius:99px;font-size:12px;font-weight:800}
+    .quest-mission h2{font-size:23px;line-height:1.17;letter-spacing:-.02em;margin:12px 0 10px}
+    .quest-meta{display:flex;flex-wrap:wrap;gap:9px;color:#647a73;font-size:13px}
+    .quest-meta span+span:before{content:'·';margin-right:9px;color:#b5c6bf}
+    .quest-rule{height:1px;background:#e0eae5;margin:16px 0}
+    .quest-preview{background:#eef8f5;border-radius:11px;padding:12px 14px;margin:0 0 11px}
+    .quest-preview-label{font-size:10px;letter-spacing:.12em;color:#547b70;font-weight:800}
+    .quest-preview-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:7px;font-size:14px}
+    .quest-preview-row strong{font-variant-numeric:tabular-nums;white-space:nowrap}
+    .quest-preview-note{font-size:12px;color:#56736a;margin:10px 0 0}
+    .quest-primary{display:block;width:100%;border:0;border-radius:10px;background:#076b54;color:#fff;min-height:48px;padding:11px 15px;font-weight:800}
+    .quest-primary:hover{background:#085642}
+    .quest-link{border:0;background:transparent;color:#155e4c;font-weight:700;padding:9px 0}
+    .quest-actions{display:flex;gap:13px;flex-wrap:wrap;align-items:center}
+    .quest-why{border-top:1px solid #e0eae5;margin-top:11px;padding-top:11px}
+    .quest-why button{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:none;padding:5px 1px;color:#153b34;font-weight:700}
+    .quest-why p{margin:8px 0 0;color:#49675e;font-size:13px;line-height:1.55}
+    .quest-why button span svg{width:18px;height:18px;transform:rotate(90deg)}
+    .quest-why button[aria-expanded=true] span svg{transform:rotate(-90deg)}
+    .quest-advisor{margin-top:13px;background:#eaf8f3;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+    .quest-advisor svg{color:#087058;flex:none}
+    .quest-advisor div{flex:1}
+    .quest-advisor strong{display:block}
+    .quest-advisor small{color:#55736a}
+    .quest-advisor button{border:0;background:transparent;color:#0b6e57;padding:4px}
+    .quest-disclaimer{color:#698077;font-size:12px;line-height:1.5;margin:16px 2px}
+    .quest-rolebar{margin-top:26px;padding:14px;border:1px dashed #b9cec5;border-radius:12px;color:#567167}
+    .quest-rolebar>span{display:block;font-size:12px;font-weight:800;margin-bottom:9px}
+    .quest-rolebar .tabs{margin:0}
+    .quest-profile{background:#eef8f4;border-radius:12px;padding:14px;margin:18px 0}
+    .quest-nav{background:#fff;border-top:1px solid #e5ede9;display:grid;grid-template-columns:repeat(4,1fr);padding:9px 12px 12px;z-index:4}
+    .quest.browser .quest-nav{position:sticky;bottom:0}
+    .quest.webview .quest-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(390px,100vw)}
+    .quest-nav button{border:0;background:none;color:#647b73;display:grid;justify-items:center;gap:3px;font-size:11px;padding:5px 2px}
+    .quest-nav button.active{color:#076b54;font-weight:800}
+    .quest-nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .quest .status{margin:14px 0}
+    .quest button:focus-visible{outline:3px solid #e6b64e;outline-offset:2px}
+    .quest ::selection{background:#d6ebdc;color:#123e32}
+    @media(max-width:760px){.quest-columns{grid-template-columns:1fr;gap:14px}.quest-main{padding:18px 20px 105px}.quest-top{padding:17px 20px 6px}.quest-goal h2{font-size:24px}.quest-section-title{margin-top:9px}}
+    @media(max-width:430px){.path-view .outer{padding:0}.quest.webview{margin:0;border-radius:0}.quest-main{padding:18px 20px 112px}.quest-skillbars{gap:10px}.quest-goal{padding:20px;display:grid;grid-template-columns:27px 1fr;align-items:start}.quest-goal h2{font-size:23px}.quest-goal button{grid-column:2;justify-self:start;padding:8px 12px}.quest-mission h2{font-size:21px}.path-view .switcher{max-width:calc(100vw - 20px);gap:2px;padding:5px}.path-view .switcher button{font-size:11px;padding:6px 8px}.path-view .switcher .label{min-width:80px;font-size:11px;padding:0 2px}}
+  </style>
 </head>
 <body>
   <div class="testbar"><b>ПРОТОТИП ДЛЯ ОБСУЖДЕНИЯ</b> · синтетические данные · действия живут только на этой странице</div>
-  <div class="outer"><div id="app"></div></div>
   <div class="switcher" aria-label="Переключатель прототипа"><button id="prev" aria-label="Предыдущий вариант">←</button><span class="label" id="variantLabel"></span><button id="next" aria-label="Следующий вариант">→</button><button id="surfaceButton"></button></div>
+  <div class="outer"><div id="app"></div></div>
   <script>
     const variants=['matrix','path','compare'];
     const variantNames={matrix:'Матрица требований',path:'Маршрут действий',compare:'Факт / прогноз'};
     const params=new URLSearchParams(location.search);
-    const state={variant:variants.includes(params.get('variant'))?params.get('variant'):'path',surface:params.get('surface')==='webview'?'webview':'browser',expanded:false,course:null,completed:false,aiAction:false,role:'employee',notice:''};
+    const state={variant:variants.includes(params.get('variant'))?params.get('variant'):'path',surface:params.get('surface')==='webview'?'webview':'browser',expanded:false,course:null,completed:false,aiAction:false,role:'employee',notice:'',profile:false};
     const courses={master:{name:'Negotiation Masterclass',date:'15 октября',skills:'Переговоры 2 → 3; работа с клиентами 2 → 3',reason:'критический разрыв по переговорам',id:'EV_032'},sales:{name:'Consultative Selling & Prospecting',date:'23 октября',skills:'Поиск клиентов 2 → 3; CRM 2 → 3',reason:'критический разрыв по поиску клиентов',id:'EV_033'}};
     const el=(id)=>document.getElementById(id);
     function setNotice(message){state.notice=message;render()}
@@ -43,9 +150,26 @@
     function ai(){return `<section class="ai"><span class="eyebrow">AI-навигатор · объяснение</span><h2>Почему эти действия?</h2><p>Для цели Middle важны переговоры и поиск клиентов. У вас Junior и расчётный уровень переговоров ${state.completed?'3':'2'} при требовании 3; поиск клиентов 2 при требовании 3. ${state.completed?'Negotiation Masterclass уже завершён; Consultative Selling & Prospecting ещё доступен и сокращает разрыв по поиску клиентов.':'По истории участия эти добровольные активности ещё не завершены. Negotiation Masterclass сокращает критический разрыв по переговорам.'}</p><p class="small muted">Факты карточки сверены с профилем, требованиями роли, историей и каталогом. Текст AI не меняет уровни, доступность или права.</p><div class="btns"><button class="btn" onclick="aiCourse()">${state.completed?'Посмотреть следующий курс':'Открыть прогноз мастер-класса'}</button><button class="btn outline" onclick="explain()">Показать основания</button></div>${state.aiAction?`<div class="callout" style="background:#31534c;color:white;border-color:#a5e6b8"><b>Основания:</b> Junior Sales Manager; Middle требует 3/5 по переговорам и поиску клиентов; сейчас ${state.completed?'3 и 2':'2 и 2'}; предложенная активность подходит текущему грейду и сокращает разрыв. Рекомендация не обещает повышение.</div>`:''}</section>`}
     function controls(){return state.notice?`<div class="status" role="status">${state.notice} <button class="btn plain" onclick="clearNotice()">Скрыть</button></div>`:''}
     function matrix(){return `${intro()}${roleTabs()}${controls()}${rolePanel()||`<div class="grid two"><div class="grid">${fact()}${roleDetail()}${prediction()}</div><div class="grid">${courseList()}${ai()}</div></div>`}`}
-    function path(){return `${intro()}${roleTabs()}${controls()}${rolePanel()||`<section class="card" style="max-width:900px;margin:auto"><h2>Маршрут к Middle</h2><div class="step"><div class="num">1</div><div class="body"><b>Достигнуто сейчас</b><p>Оценка и учебный прогресс — разные величины.</p>${fact()}</div></div><div class="step"><div class="num">2</div><div class="body"><b>${state.completed?'Учебный шаг завершён':'Выберите учебный шаг'}</b><p>${state.completed?'Расчётные переговоры 3/5; оценённый уровень остаётся 2/5.':'Прогноз показывает только условный эффект завершения.'}</p>${ai()}${courseList()}${prediction()}</div></div><div class="step"><div class="num">3</div><div class="body"><b>Что ещё нужно для Middle</b><p>Раскройте все требования выбранной роли.</p>${roleDetail()}</div></div><div class="step"><div class="num">4</div><div class="body"><b>Карьерный разговор</b><p>Даже полное соответствие требованиям не назначает на должность; следующий кадровый шаг обсуждается отдельно.</p></div></div></section>`}`}
+    function questIcon(name){const paths={flag:'<path d="M5 21V4m0 1c5-3 8 3 15 0v11c-7 3-10-3-15 0"/>',award:'<circle cx="12" cy="8" r="5"/><path d="M8 12 7 22l5-3 5 3-1-10"/>',check:'<path d="m5 12 5 5L20 7"/>',lock:'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',x:'<path d="M5 5l14 14M19 5 5 19"/>',chevron:'<path d="m9 5 7 7-7 7"/>',route:'<circle cx="5" cy="18" r="2"/><circle cx="19" cy="6" r="2"/><path d="M7 18h5a4 4 0 0 0 4-4V8"/>',list:'<path d="M8 5h13M8 12h13M8 19h13"/><path d="M3 5h.01M3 12h.01M3 19h.01"/>',spark:'<path d="m12 2 2.1 7.9L22 12l-7.9 2.1L12 22l-2.1-7.9L2 12l7.9-2.1z"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'};return `<svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]}</svg>`}
+    function questNav(){return `<nav class="quest-nav" aria-label="Разделы Career Quest"><button class="active" onclick="document.getElementById('questTop').scrollIntoView()">${questIcon('route')}Путь</button><button onclick="document.getElementById('questMission').scrollIntoView()">${questIcon('list')}Активности</button><button onclick="document.getElementById('questAdvisor').scrollIntoView()">${questIcon('spark')}Советник</button><button onclick="toggleProfile()">${questIcon('user')}Профиль</button></nav>`}
+    function path(){
+      const featuredId=state.course||(state.completed?'sales':'master');
+      const featured=courses[featuredId];
+      const selected=state.course===featuredId;
+      const currentNegotiation=state.completed?3:2;
+      const employee=`<div class="quest-welcome"><div><p>Алибек, ваш следующий шаг</p><h1>Мой путь</h1></div><span class="quest-demo">Демо</span></div>
+        <section class="quest-goal" aria-label="Карьерная цель">${questIcon('flag')}<div><small>МОЯ ЦЕЛЬ</small><h2>Sales Manager Middle</h2><p>Sales Manager · Junior</p></div><button onclick="toggleRole()" aria-expanded="${state.expanded}">Требования</button></section>
+        ${state.expanded?`<div class="quest-goal-detail"><b>Критические требования Middle</b>Переговоры ${currentNegotiation}/3 · Поиск клиентов 2/3<br>CRM 2/3 и другие навыки тоже входят в полный профиль. Соответствие не назначает на роль.</div>`:''}
+        <section class="quest-progress"><div class="quest-progress-head">${questIcon('award')}<div><span>Навыки для Middle</span><strong>Критические требования</strong></div><b>${state.completed?'1 из 2':'0 из 2'} выполнено</b></div><div class="quest-skillbars"><div class="${state.completed?'complete':''}"><label>Переговоры <b>${currentNegotiation}/3</b></label><i></i></div><div><label>Поиск клиентов <b>2/3</b></label><i></i></div></div></section>
+        <div class="quest-columns"><section><div class="quest-section-title"><h2>Маршрут к Middle</h2><span>3 этапа</span></div><div class="quest-route"><div class="quest-stage"><span class="quest-node">${questIcon('check')}</span><div class="quest-stage-content"><strong>Цель выбрана</strong><small>1 октября 2026 · исходный срез</small><p>Вы выбрали следующий грейд.</p></div><button aria-label="Показать требования цели" onclick="toggleRole()">${questIcon('chevron')}</button></div><div class="quest-stage current"><span class="quest-node"></span><div class="quest-stage-content"><strong>Развить ключевые навыки</strong><p>${state.completed?'Переговоры 3/3; поиск клиентов ещё 2/3.':'Следующий шаг — переговоры 2/3 → 3/3.'}</p></div><button aria-label="Перейти к активности" onclick="document.getElementById('questMission').scrollIntoView()">${questIcon('chevron')}</button></div><div class="quest-stage waiting"><span class="quest-node">${questIcon('lock')}</span><div class="quest-stage-content"><strong>Обсудить карьерный шаг</strong><p>После соответствия требованиям — разговор, не автоматическое назначение.</p></div></div></div></section>
+        <div><section class="quest-mission" id="questMission"><div class="quest-mission-top"><span class="quest-tag">Следующая активность</span><span class="quest-code">${featured.id}</span></div><h2>${featured.name}</h2><div class="quest-meta"><span>${featured.date} 2026</span><span>Sales Manager Junior</span><span>Добровольно</span></div><div class="quest-rule"></div><div class="quest-preview"><div class="quest-preview-label">${selected?'ПРОГНОЗ · ЕСЛИ ЗАВЕРШИТЬ':'ПОТЕНЦИАЛЬНЫЙ ЭФФЕКТ'}</div>${featuredId==='master'?`<div class="quest-preview-row"><span>Переговоры</span><strong>${currentNegotiation} → 3</strong></div><div class="quest-preview-row"><span>Ведение клиентов</span><strong>2 → 3</strong></div>`:`<div class="quest-preview-row"><span>Поиск клиентов</span><strong>2 → 3</strong></div><div class="quest-preview-row"><span>CRM</span><strong>2 → 3</strong></div>`}${selected?`<p class="quest-preview-note">По правилу ${featured.id}: gain=1, max_level=5. Остальные разрывы к Middle остаются. Это прогноз до завершения активности.</p>`:''}</div>${selected?`<div class="quest-actions"><button class="quest-link" onclick="cancelCourse()">Отменить выбор</button>${featuredId==='master'&&!state.completed?`<button class="quest-link" onclick="completeCourse()">Показать эффект завершения</button>`:''}</div>`:`<button class="quest-primary" onclick="selectCourse('${featuredId}')">Показать прогноз</button>`}<div class="quest-why"><button onclick="explain()" aria-expanded="${state.aiAction}">Почему этот шаг? <span>${questIcon('chevron')}</span></button>${state.aiAction?`<p>AI учитывает грейд Junior, цель Middle, критический разрыв ${featuredId==='master'?'по переговорам':'по поиску клиентов'} и историю участия. ${featured.name} подходит текущей роли и сокращает указанный разрыв. Выбор не записывает участие и не меняет навыки.</p>`:''}</div></section><section class="quest-advisor" id="questAdvisor">${questIcon('spark')}<div><strong>AI-советник</strong><small>${state.completed?'Следующий разрыв — поиск клиентов':'Есть ещё шаг для поиска клиентов и CRM'}</small></div><button aria-label="Показать другое действие AI" onclick="showAlternative()">${questIcon('chevron')}</button></section><p class="quest-disclaimer">Последняя оценка переговоров — 2/5. ${state.completed?'После завершённого мастер-класса расчётный уровень — 3/5.':'Если завершить мастер-класс, расчётный уровень станет 3/5.'} ОТК, рабочий вклад и должность от курса не меняются.</p></div></div>`;
+      return `<div class="quest ${state.surface}" id="questTop"><header class="quest-top ${state.surface==='webview'?'quest-host':''}">${state.surface==='webview'?`<button class="quest-host-control back" aria-label="Назад в тестовую оболочку" onclick="setNotice('На корневом экране Back возвращает в тестовую оболочку.')">${questIcon('chevron')}</button>`:''}<div class="quest-brand"><span class="quest-mark">H</span>Career Quest</div>${state.surface==='webview'?`<button class="quest-host-control" aria-label="Закрыть Career Quest" onclick="setNotice('Закрытие возвращает в тестовую оболочку.')">${questIcon('x')}</button>`:`<span class="quest-avatar" aria-label="Алибек Муканов">АМ</span>`}</header><main class="quest-main">${state.profile?`<div class="quest-profile"><b>Алибек Муканов</b><div>Sales Manager · Junior</div><div>Цель: Sales Manager Middle</div></div>`:''}${state.role==='employee'?employee:`<div class="quest-welcome"><div><p>Career Quest · демонстрация</p><h1>${{analyst:'Подтверждение результатов',manager:'Моя команда',hr:'Развитие компании'}[state.role]}</h1></div></div>${rolePanel()}`}${controls()}<div class="quest-rolebar"><span>Демо: переключить представление</span>${roleTabs()}</div></main>${questNav()}</div>`
+    }
+    function showAlternative(){state.course='sales';state.notice='AI открыл другой допустимый шаг и его условный прогноз.';render();document.getElementById('questMission')?.scrollIntoView({block:'center',behavior:'smooth'})}
+    function toggleProfile(){state.profile=!state.profile;render();document.getElementById('questTop')?.scrollIntoView()}
+
     function compare(){return `${intro()}${roleTabs()}${controls()}${rolePanel()||`<div class="compare"><div>${fact()}</div><div>${prediction()}</div><div class="wide grid two">${roleDetail()}${courseList()}</div><div class="wide">${ai()}</div></div>`}`}
-    function render(){el('app').innerHTML=shell(({matrix,path,compare})[state.variant]());el('variantLabel').textContent=variantNames[state.variant];el('surfaceButton').textContent=state.surface==='browser'?'Узкий WebView':'Широкий браузер';params.set('variant',state.variant);params.set('surface',state.surface);history.replaceState({},'',location.pathname+'?'+params.toString())}
+    function render(){document.body.classList.toggle('path-view',state.variant==='path');el('app').innerHTML=state.variant==='path'?path():shell(({matrix,compare})[state.variant]());el('variantLabel').textContent=variantNames[state.variant];el('surfaceButton').textContent=state.surface==='browser'?'Узкий WebView':'Широкий браузер';params.set('variant',state.variant);params.set('surface',state.surface);history.replaceState({},'',location.pathname+'?'+params.toString())}
     function setVariant(i){state.variant=variants[(i+variants.length)%variants.length];render()}
     function toggleRole(){state.expanded=!state.expanded;render()}
     function chooseRole(role){state.role=role;render()}
