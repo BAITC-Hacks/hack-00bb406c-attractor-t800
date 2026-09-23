@@ -1,0 +1,3 @@
+PASS: reset date persisted after Compose restart
+PASS: custom date and operator session persisted after Compose restart
+PASS: full employee profile, skills and history unchanged after restart
