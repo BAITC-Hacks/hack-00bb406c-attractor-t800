@@ -230,3 +230,6 @@ app.include_router(score_router(get_db, current_session))
 
 from app.development_consents import router as consent_router
 app.include_router(consent_router(get_db, current_session))
+
+from app.comparison_routes import router as comparison_router
+app.include_router(comparison_router(get_db, current_session))
