@@ -1,0 +1,5 @@
+rag_engine/.env
+rag_engine/__pycache__/
+rag_engine/app/__pycache__/
+rag_engine/scripts/__pycache__/
+*.pyc
