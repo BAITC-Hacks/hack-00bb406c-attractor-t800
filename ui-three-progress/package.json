@@ -1,0 +1,11 @@
+{
+  "name": "halyk-tree-progress-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Throwaway employee-growth UI prototype with one mock-data document",
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs",
+    "preview": "node server.mjs --production"
+  }
+}

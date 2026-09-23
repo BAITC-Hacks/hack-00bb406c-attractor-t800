@@ -1,0 +1,922 @@
+{
+  "_document": {
+    "title": "Halyk · Мой рост — единый документ моков",
+    "purpose": "Все сотрудники, тесты, вопросы, цели, награды и интеграции — вымышленные данные для интерактивного UI-прототипа. Приложение загружает этот файл; изменения существуют только в памяти до перезагрузки.",
+    "date": "2026-09-23",
+    "rules": {
+      "treeSize": "Стаж определяет размер: 6 месяцев — 0.65, 12 месяцев — 0.85, 24+ — 1.0.",
+      "xp": "Каждый уникальный тест или вклад начисляет XP один раз. Непройденный тест не даёт XP. Задачи и встречи требуют подтверждения.",
+      "cosmetics": "Темы разблокируются по накопленному XP. XP не тратится.",
+      "career": "Игровой уровень не является грейдом. Повышение и переход согласуются людьми.",
+      "auth": "Вход Рост показывается только авторизованному сотруднику. Halyk в локальной навигации возвращает в суперапп."
+    }
+  },
+  "bank": {
+    "cashback": 1553.68,
+    "balance": 284650,
+    "card": "Halyk Bonus Digital",
+    "lastDigits": "4821",
+    "services": [
+      {
+        "name": "Карты",
+        "icon": "card"
+      },
+      {
+        "name": "Депозиты",
+        "icon": "wallet"
+      },
+      {
+        "name": "Кредиты",
+        "icon": "cash"
+      },
+      {
+        "name": "Invest",
+        "icon": "chart"
+      },
+      {
+        "name": "Маркет",
+        "icon": "bag"
+      },
+      {
+        "name": "Travel",
+        "icon": "plane"
+      },
+      {
+        "name": "Страховка",
+        "icon": "shield"
+      },
+      {
+        "name": "Госуслуги",
+        "icon": "building"
+      }
+    ]
+  },
+  "employees": [
+    {
+      "id": "aizhan",
+      "name": "Айжан Сарсенова",
+      "firstName": "Айжан",
+      "initials": "АС",
+      "role": "Middle Frontend Developer",
+      "department": "Digital Banking",
+      "team": "Команда платежей",
+      "manager": "Данияр Алиев",
+      "city": "Алматы",
+      "email": "aizhan@example.test",
+      "tenureMonths": 12,
+      "xp": 1240,
+      "goalId": "senior",
+      "tree": "oak",
+      "theme": "meadow",
+      "employeeId": "HLK-2048",
+      "startDate": "23 сентября 2025",
+      "skills": [
+        {
+          "name": "React и TypeScript",
+          "score": 90
+        },
+        {
+          "name": "Качество кода",
+          "score": 85
+        },
+        {
+          "name": "System Design",
+          "score": 64
+        },
+        {
+          "name": "Коммуникация",
+          "score": 88
+        }
+      ],
+      "certificates": [
+        "Frontend foundations · 2025",
+        "Безопасная разработка · 2026"
+      ]
+    },
+    {
+      "id": "askar",
+      "name": "Аскар Нурланов",
+      "firstName": "Аскар",
+      "initials": "АН",
+      "role": "Middle Frontend Developer",
+      "department": "Digital Banking",
+      "team": "Команда платежей",
+      "manager": "Данияр Алиев",
+      "city": "Алматы",
+      "email": "askar@example.test",
+      "tenureMonths": 6,
+      "xp": 620,
+      "goalId": "senior",
+      "tree": "oak",
+      "theme": "meadow",
+      "employeeId": "HLK-3096",
+      "startDate": "23 марта 2026",
+      "skills": [
+        {
+          "name": "React и TypeScript",
+          "score": 75
+        },
+        {
+          "name": "Качество кода",
+          "score": 70
+        },
+        {
+          "name": "System Design",
+          "score": 50
+        },
+        {
+          "name": "Коммуникация",
+          "score": 82
+        }
+      ],
+      "certificates": [
+        "Frontend foundations · 2026"
+      ]
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "xp": 0
+    },
+    {
+      "level": 2,
+      "xp": 200
+    },
+    {
+      "level": 3,
+      "xp": 400
+    },
+    {
+      "level": 4,
+      "xp": 600
+    },
+    {
+      "level": 5,
+      "xp": 800
+    },
+    {
+      "level": 6,
+      "xp": 1000
+    },
+    {
+      "level": 7,
+      "xp": 1200
+    },
+    {
+      "level": 8,
+      "xp": 1600
+    },
+    {
+      "level": 9,
+      "xp": 2200
+    },
+    {
+      "level": 10,
+      "xp": 3000
+    }
+  ],
+  "tests": [
+    {
+      "id": "react",
+      "title": "React patterns",
+      "category": "IT",
+      "skill": "React и TypeScript",
+      "description": "Проверьте, как вы проектируете компоненты, работаете с состоянием и оптимизируете рендеринг.",
+      "minutes": 15,
+      "xp": 200,
+      "required": true,
+      "status": "new",
+      "score": null,
+      "passScore": 80,
+      "questionSet": "react"
+    },
+    {
+      "id": "architecture",
+      "title": "System Design",
+      "category": "IT",
+      "skill": "System Design",
+      "description": "Архитектура масштабируемых систем: кеширование, очереди и устойчивость.",
+      "minutes": 20,
+      "xp": 200,
+      "required": true,
+      "status": "failed",
+      "score": 64,
+      "passScore": 80,
+      "questionSet": "architecture"
+    },
+    {
+      "id": "sql",
+      "title": "Основы SQL",
+      "category": "IT",
+      "skill": "Работа с данными",
+      "description": "Запросы, индексы и эффективная работа с реляционными данными.",
+      "minutes": 12,
+      "xp": 200,
+      "required": true,
+      "status": "passed",
+      "score": 92,
+      "passScore": 80,
+      "questionSet": "sql"
+    },
+    {
+      "id": "typescript",
+      "title": "TypeScript",
+      "category": "IT",
+      "skill": "React и TypeScript",
+      "description": "Типы, интерфейсы и надёжный код.",
+      "minutes": 15,
+      "xp": 200,
+      "required": true,
+      "status": "passed",
+      "score": 95,
+      "passScore": 80,
+      "questionSet": "react"
+    },
+    {
+      "id": "security",
+      "title": "Безопасная разработка",
+      "category": "IT",
+      "skill": "Безопасность",
+      "description": "Практика безопасной разработки банковских сервисов.",
+      "minutes": 10,
+      "xp": 200,
+      "required": true,
+      "status": "passed",
+      "score": 100,
+      "passScore": 80,
+      "questionSet": "architecture"
+    },
+    {
+      "id": "git",
+      "title": "Git и командная работа",
+      "category": "IT",
+      "skill": "Качество кода",
+      "description": "Ветки, review и совместная разработка.",
+      "minutes": 10,
+      "xp": 200,
+      "required": true,
+      "status": "passed",
+      "score": 90,
+      "passScore": 80,
+      "questionSet": "review"
+    },
+    {
+      "id": "api",
+      "title": "Проектирование API",
+      "category": "IT",
+      "skill": "Архитектура",
+      "description": "Контракты и взаимодействие сервисов.",
+      "minutes": 15,
+      "xp": 200,
+      "required": true,
+      "status": "passed",
+      "score": 86,
+      "passScore": 80,
+      "questionSet": "architecture"
+    },
+    {
+      "id": "css",
+      "title": "CSS и адаптивность",
+      "category": "IT",
+      "skill": "Интерфейсы",
+      "description": "Доступная и адаптивная вёрстка.",
+      "minutes": 12,
+      "xp": 200,
+      "required": true,
+      "status": "passed",
+      "score": 94,
+      "passScore": 80,
+      "questionSet": "react"
+    },
+    {
+      "id": "testing",
+      "title": "Тестирование интерфейсов",
+      "category": "IT",
+      "skill": "Качество кода",
+      "description": "Практика проверки пользовательских сценариев.",
+      "minutes": 15,
+      "xp": 200,
+      "required": true,
+      "status": "passed",
+      "score": 88,
+      "passScore": 80,
+      "questionSet": "review"
+    },
+    {
+      "id": "accessibility",
+      "title": "Доступность интерфейсов",
+      "category": "IT",
+      "skill": "Интерфейсы",
+      "description": "Клавиатурная навигация и семантика.",
+      "minutes": 12,
+      "xp": 200,
+      "required": true,
+      "status": "new",
+      "score": null,
+      "passScore": 80,
+      "questionSet": "accessibility"
+    },
+    {
+      "id": "performance",
+      "title": "Web Performance",
+      "category": "IT",
+      "skill": "Производительность",
+      "description": "Скорость загрузки и отзывчивость.",
+      "minutes": 15,
+      "xp": 200,
+      "required": true,
+      "status": "new",
+      "score": null,
+      "passScore": 80,
+      "questionSet": "performance"
+    },
+    {
+      "id": "review",
+      "title": "Практика code review",
+      "category": "IT",
+      "skill": "Качество кода",
+      "description": "Полезная обратная связь на код коллег.",
+      "minutes": 10,
+      "xp": 200,
+      "required": true,
+      "status": "new",
+      "score": null,
+      "passScore": 80,
+      "questionSet": "review"
+    },
+    {
+      "id": "discovery",
+      "title": "Product discovery",
+      "category": "Продукт",
+      "skill": "Исследования",
+      "description": "Научитесь проверять гипотезы и находить настоящую проблему пользователя.",
+      "minutes": 20,
+      "xp": 200,
+      "required": false,
+      "status": "new",
+      "score": null,
+      "passScore": 80,
+      "questionSet": "product"
+    },
+    {
+      "id": "mentor",
+      "title": "Навыки наставника",
+      "category": "Лидерство",
+      "skill": "Наставничество",
+      "description": "Помогайте коллегам расти через вопросы и обратную связь.",
+      "minutes": 12,
+      "xp": 200,
+      "required": false,
+      "status": "new",
+      "score": null,
+      "passScore": 80,
+      "questionSet": "mentoring"
+    },
+    {
+      "id": "metrics",
+      "title": "Продуктовые метрики",
+      "category": "Продукт",
+      "skill": "Аналитика",
+      "description": "Выбирайте метрики, которые отражают пользу для клиента.",
+      "minutes": 15,
+      "xp": 200,
+      "required": false,
+      "status": "new",
+      "score": null,
+      "passScore": 80,
+      "questionSet": "product"
+    },
+    {
+      "id": "communication",
+      "title": "Сложные разговоры",
+      "category": "Лидерство",
+      "skill": "Коммуникация",
+      "description": "Спокойная и конкретная обратная связь в команде.",
+      "minutes": 10,
+      "xp": 200,
+      "required": false,
+      "status": "new",
+      "score": null,
+      "passScore": 80,
+      "questionSet": "mentoring"
+    }
+  ],
+  "questions": {
+    "react": [
+      {
+        "text": "Что помогает пропустить рендер компонента, если его props не изменились?",
+        "options": [
+          "React.memo",
+          "Новый key при каждом рендере",
+          "setState внутри useEffect",
+          "Сохранение props в localStorage"
+        ],
+        "correct": 0,
+        "explanation": "React.memo позволяет пропустить повторный рендер при неизменных props."
+      },
+      {
+        "text": "Где хранить состояние, которое нужно двум соседним компонентам?",
+        "options": [
+          "В каждом компоненте отдельно",
+          "В ближайшем общем родителе",
+          "В глобальной переменной файла",
+          "В DOM-атрибуте"
+        ],
+        "correct": 1,
+        "explanation": "Поднимите общее состояние к ближайшему общему родителю."
+      },
+      {
+        "text": "Что нужно использовать как key элемента изменяемого списка?",
+        "options": [
+          "Случайное число",
+          "Текущее время",
+          "Стабильный идентификатор записи",
+          "Индекс независимо от порядка"
+        ],
+        "correct": 2,
+        "explanation": "Стабильный ID помогает React корректно сопоставлять элементы."
+      },
+      {
+        "text": "Для чего возвращать функцию из useEffect?",
+        "options": [
+          "Для очистки подписки или таймера",
+          "Для рендера нового компонента",
+          "Для возврата props",
+          "Для перезагрузки страницы"
+        ],
+        "correct": 0,
+        "explanation": "Функция очистки освобождает ресурсы при смене зависимостей и размонтировании."
+      },
+      {
+        "text": "Как обновить массив, хранящийся в состоянии React?",
+        "options": [
+          "Изменить его через push без setter",
+          "Создать новый массив и вызвать setter",
+          "Изменить DOM вручную",
+          "Обновить только длину"
+        ],
+        "correct": 1,
+        "explanation": "Создайте новую ссылку на массив и передайте её функции обновления состояния."
+      }
+    ],
+    "architecture": [
+      {
+        "text": "Что помогает снизить повторную нагрузку чтения на базу?",
+        "options": [
+          "Кеш с подходящим временем жизни",
+          "Больше одинаковых запросов",
+          "Отключение индексов",
+          "Повторная авторизация"
+        ],
+        "correct": 0,
+        "explanation": "Кеш позволяет повторно использовать результат, учитывая требования к актуальности."
+      },
+      {
+        "text": "Как безопасно повторить запрос после сетевого сбоя?",
+        "options": [
+          "Изменить сумму",
+          "Использовать ключ идемпотентности",
+          "Всегда создать новую операцию",
+          "Убрать проверку ответа"
+        ],
+        "correct": 1,
+        "explanation": "Ключ идемпотентности позволяет серверу не выполнять одну операцию дважды."
+      },
+      {
+        "text": "Что помогает обработать всплеск фоновых задач?",
+        "options": [
+          "Синхронный цикл в UI",
+          "Хранение в браузере",
+          "Очередь сообщений",
+          "Удаление логов"
+        ],
+        "correct": 2,
+        "explanation": "Очередь разделяет приём задач и их обработку."
+      }
+    ],
+    "sql": [
+      {
+        "text": "Как выбрать уникальные значения столбца?",
+        "options": [
+          "SELECT DISTINCT",
+          "SELECT ALL",
+          "ORDER BY",
+          "DELETE"
+        ],
+        "correct": 0,
+        "explanation": "DISTINCT исключает дубликаты из результата."
+      }
+    ],
+    "review": [
+      {
+        "text": "Какой комментарий на code review наиболее полезен?",
+        "options": [
+          "Всё плохо",
+          "Вот сценарий, где возникает ошибка, и способ её исправить",
+          "Переделай всё",
+          "Мне не нравится"
+        ],
+        "correct": 1,
+        "explanation": "Конкретный сценарий и предложение помогают автору понять проблему."
+      },
+      {
+        "text": "Что важнее проверить в первую очередь?",
+        "options": [
+          "Порядок личных предпочтений",
+          "Цвет редактора",
+          "Корректность поведения и безопасность",
+          "Размер шрифта автора"
+        ],
+        "correct": 2,
+        "explanation": "Сначала проверьте поведение, безопасность и понятность решения."
+      }
+    ],
+    "accessibility": [
+      {
+        "text": "Как обозначить кнопку только с иконкой для скринридера?",
+        "options": [
+          "Добавить доступное имя через aria-label",
+          "Уменьшить её",
+          "Добавить случайный title",
+          "Убрать фокус"
+        ],
+        "correct": 0,
+        "explanation": "Доступное имя объясняет назначение кнопки."
+      },
+      {
+        "text": "Должна ли форма работать с клавиатуры?",
+        "options": [
+          "Только на десктопе",
+          "Да, все действия должны быть доступны",
+          "Нет",
+          "Только поле поиска"
+        ],
+        "correct": 1,
+        "explanation": "Все интерактивные действия должны быть доступны с клавиатуры."
+      }
+    ],
+    "performance": [
+      {
+        "text": "Как уменьшить начальную загрузку большого приложения?",
+        "options": [
+          "Загрузить всё заранее",
+          "Разделить код и лениво загрузить необязательные части",
+          "Увеличить картинки",
+          "Добавить синхронные запросы"
+        ],
+        "correct": 1,
+        "explanation": "Разделение кода снижает объём ресурсов, необходимых для первого экрана."
+      }
+    ],
+    "product": [
+      {
+        "text": "С чего начать проверку продуктовой гипотезы?",
+        "options": [
+          "Сразу написать весь продукт",
+          "Сформулировать проблему и критерий успеха",
+          "Выбрать цвет логотипа",
+          "Копировать конкурента"
+        ],
+        "correct": 1,
+        "explanation": "Проблема и критерий успеха позволяют осмысленно проверить гипотезу."
+      },
+      {
+        "text": "Какая метрика ближе к пользе клиенту платёжного приложения?",
+        "options": [
+          "Количество строк кода",
+          "Число встреч",
+          "Доля успешно завершённых платежей",
+          "Количество баннеров"
+        ],
+        "correct": 2,
+        "explanation": "Успешные платежи отражают достижение пользователем своей цели."
+      }
+    ],
+    "mentoring": [
+      {
+        "text": "Как помочь коллеге самостоятельно решить задачу?",
+        "options": [
+          "Всегда делать всё за него",
+          "Обсудить его подход и задать направляющие вопросы",
+          "Не отвечать",
+          "Сравнить с другими публично"
+        ],
+        "correct": 1,
+        "explanation": "Вопросы и обсуждение развивают самостоятельность."
+      },
+      {
+        "text": "Как дать полезную обратную связь?",
+        "options": [
+          "Описать конкретное действие, его эффект и следующий шаг",
+          "Оценить личность",
+          "Использовать общие слова",
+          "Обсудить только с другими"
+        ],
+        "correct": 0,
+        "explanation": "Обратная связь касается наблюдаемого поведения и помогает выбрать следующий шаг."
+      }
+    ]
+  },
+  "goals": [
+    {
+      "id": "senior",
+      "type": "promotion",
+      "title": "Senior Frontend Developer",
+      "shortTitle": "Middle → Senior",
+      "department": "Digital Banking",
+      "description": "Больше влияния. Более сложные задачи. Следующий шаг в вашей профессии.",
+      "readiness": 60,
+      "confirmed": 6,
+      "total": 10,
+      "steps": [
+        {
+          "title": "React и TypeScript",
+          "detail": "Практические навыки подтверждены",
+          "done": true
+        },
+        {
+          "title": "Качество кода",
+          "detail": "3 code review подтверждены",
+          "done": true
+        },
+        {
+          "title": "System Design",
+          "detail": "Пройти тест с результатом от 80%",
+          "testId": "architecture",
+          "done": false
+        },
+        {
+          "title": "Наставничество",
+          "detail": "Провести 2 встречи с коллегой",
+          "activityId": "mentoring",
+          "done": false
+        },
+        {
+          "title": "Калибровка с руководителем",
+          "detail": "Обсудить готовность и рабочие результаты",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "product",
+      "type": "transfer",
+      "title": "Product Manager",
+      "shortTitle": "Разработка → Продукт",
+      "department": "Команда платежей",
+      "description": "Смотрите на продукт шире: от проблемы клиента до измеримого результата.",
+      "readiness": 43,
+      "confirmed": 3,
+      "total": 7,
+      "steps": [
+        {
+          "title": "Техническая база",
+          "detail": "Ваш текущий опыт",
+          "done": true
+        },
+        {
+          "title": "Работа с командой",
+          "detail": "Навык подтверждён",
+          "done": true
+        },
+        {
+          "title": "Product discovery",
+          "detail": "Исследования и проверка гипотез",
+          "testId": "discovery",
+          "done": false
+        },
+        {
+          "title": "Продуктовые метрики",
+          "detail": "Выбор метрик и оценка результата",
+          "testId": "metrics",
+          "done": false
+        },
+        {
+          "title": "Знакомство с командой",
+          "detail": "1:1 с лидом продукта",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "platform",
+      "type": "transfer",
+      "title": "Frontend Platform Engineer",
+      "shortTitle": "Продукт → Платформа",
+      "department": "Engineering Platform",
+      "description": "Создавайте инструменты, которые помогают расти всем продуктовым командам.",
+      "readiness": 57,
+      "confirmed": 4,
+      "total": 7,
+      "steps": [
+        {
+          "title": "TypeScript",
+          "detail": "Навык подтверждён",
+          "done": true
+        },
+        {
+          "title": "Качество кода",
+          "detail": "Практика review",
+          "done": true
+        },
+        {
+          "title": "Web Performance",
+          "detail": "Производительность платформы",
+          "testId": "performance",
+          "done": false
+        },
+        {
+          "title": "System Design",
+          "detail": "Архитектура инструментов",
+          "testId": "architecture",
+          "done": false
+        },
+        {
+          "title": "Знакомство с командой",
+          "detail": "Обсудить переход с лидом",
+          "done": false
+        }
+      ]
+    }
+  ],
+  "trees": [
+    {
+      "id": "oak",
+      "name": "Дуб",
+      "description": "Уверенность в каждом шаге",
+      "xp": 0,
+      "asset": "assets/oak.png",
+      "source": {
+        "provider": "Higgsfield",
+        "model": "gpt_image_2_5",
+        "jobId": "ccb9b4a4-37d2-41b9-8714-38df710b1dd7",
+        "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3AzKf1dmqJlJag1aIKPudHRiXHc/hf_20260923_114424_ccb9b4a4-37d2-41b9-8714-38df710b1dd7.png"
+      }
+    },
+    {
+      "id": "apple",
+      "name": "Яблоня",
+      "description": "Ваши усилия приносят плоды",
+      "xp": 400,
+      "asset": "assets/apple.png",
+      "source": {
+        "provider": "Higgsfield",
+        "model": "gpt_image_2_5",
+        "jobId": "7077d3de-ffa6-4328-8340-79e425fd17cd",
+        "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3AzKf1dmqJlJag1aIKPudHRiXHc/hf_20260923_114424_7077d3de-ffa6-4328-8340-79e425fd17cd.png"
+      }
+    },
+    {
+      "id": "pine",
+      "name": "Сосна",
+      "description": "Расти, оставаясь собой",
+      "xp": 600,
+      "asset": "assets/pine.png",
+      "source": {
+        "provider": "Higgsfield",
+        "model": "gpt_image_2_5",
+        "jobId": "63936861-8a29-4dda-b71a-b9694e71c55f",
+        "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3AzKf1dmqJlJag1aIKPudHRiXHc/hf_20260923_114424_63936861-8a29-4dda-b71a-b9694e71c55f.png"
+      }
+    }
+  ],
+  "themes": [
+    {
+      "id": "meadow",
+      "name": "Зелёный луг",
+      "description": "Свежесть нового дня",
+      "xp": 0
+    },
+    {
+      "id": "autumn",
+      "name": "Золотая осень",
+      "description": "Тёплые краски достижений",
+      "xp": 1000
+    },
+    {
+      "id": "night",
+      "name": "Ночной сад",
+      "description": "Пусть ваши идеи светятся",
+      "xp": 1600
+    }
+  ],
+  "activities": [
+    {
+      "id": "test",
+      "title": "Тест навыка",
+      "detail": "Проверьте себя и найдите точки роста",
+      "xp": 200,
+      "icon": "book"
+    },
+    {
+      "id": "meeting",
+      "title": "1:1 с тимлидом",
+      "detail": "Обсудите развитие и получите обратную связь",
+      "xp": 100,
+      "icon": "people"
+    },
+    {
+      "id": "review",
+      "title": "Code review",
+      "detail": "Помогите коллеге сделать код лучше",
+      "xp": 80,
+      "icon": "code"
+    },
+    {
+      "id": "mentoring",
+      "title": "Наставничество",
+      "detail": "Поделитесь опытом с коллегой",
+      "xp": 150,
+      "icon": "sprout"
+    },
+    {
+      "id": "sharing",
+      "title": "Обмен знаниями",
+      "detail": "Проведите внутренний доклад или воркшоп",
+      "xp": 120,
+      "icon": "spark"
+    },
+    {
+      "id": "jira",
+      "title": "Задача Jira",
+      "detail": "Подтвердите результат выполненной задачи",
+      "xp": 100,
+      "icon": "jira"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "jira-284",
+      "title": "HLK-284 · Ускорение платежей",
+      "detail": "Время отклика сокращено на 18%",
+      "type": "jira",
+      "status": "pending",
+      "xp": 100,
+      "date": "Сегодня"
+    },
+    {
+      "id": "review-148",
+      "title": "Code review · PR #148",
+      "detail": "Подтверждено Данияром Алиевым",
+      "type": "review",
+      "status": "confirmed",
+      "xp": 80,
+      "date": "Вчера"
+    },
+    {
+      "id": "meeting-0920",
+      "title": "1:1 · Карьерный план",
+      "detail": "Обсудили шаги к Senior",
+      "type": "meeting",
+      "status": "confirmed",
+      "xp": 100,
+      "date": "20 сентября"
+    },
+    {
+      "id": "sharing-0909",
+      "title": "Доклад · Доступный интерфейс",
+      "detail": "Внутренний knowledge sharing",
+      "type": "sharing",
+      "status": "confirmed",
+      "xp": 120,
+      "date": "9 сентября"
+    }
+  ],
+  "jira": {
+    "workspace": "Digital Banking",
+    "project": "HLK",
+    "lastSync": "10:24",
+    "newTask": {
+      "id": "jira-301",
+      "title": "HLK-301 · Доступная форма перевода",
+      "detail": "Форма работает с клавиатуры и скринридером",
+      "type": "jira",
+      "status": "pending",
+      "xp": 100,
+      "date": "Сегодня"
+    }
+  },
+  "meetingSlots": [
+    "24 сентября, 11:00",
+    "24 сентября, 15:30",
+    "25 сентября, 10:00"
+  ],
+  "variants": [
+    {
+      "id": "A",
+      "name": "Живое дерево",
+      "description": "Дерево в центре внимания. Навыки — на ветвях, следующий шаг — под рукой."
+    },
+    {
+      "id": "B",
+      "name": "Путь к цели",
+      "description": "Карьерная дорожка ведёт через навыки и практику. Дерево сопровождает путь."
+    },
+    {
+      "id": "C",
+      "name": "Мой фокус",
+      "description": "Сначала одно полезное действие на сегодня. Затем прогресс и коллекция достижений."
+    }
+  ]
+}
